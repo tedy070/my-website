@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>maNTapps Wedding — Budgeting Pernikahan</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  /* Palette biru muda soft luxury */
+  --bg:#f0f6ff;
+  --bg1:#ffffff;
+  --bg2:#e8f2ff;
+  --bg3:#d4e8ff;
+  --bg4:#c2dcff;
+  --border:#d0e4f7;
+  --border2:#b8d4f0;
+
+  --blue:#2563eb;
+  --blue2:#3b82f6;
+  --blue3:#60a5fa;
+  --blue4:#93c5fd;
+  --blueDim:#dbeafe;
+  --blueDeep:#1e40af;
+
+  --sky:#0ea5e9;
+  --skyDim:#e0f2fe;
+
+  --rose:#f43f5e;
+  --roseDim:#ffe4e6;
+  --roseGold:#c084fc;
+
+  --gold:#d97706;
+  --goldSoft:#fbbf24;
+  --goldDim:#fef3c7;
+
+  --green:#059669;
+  --greenDim:#d1fae5;
+
+  --amber:#d97706;
+  --amberDim:#fef3c7;
+
+  --red:#dc2626;
+  --redDim:#fee2e2;
+
+  --purple:#7c3aed;
+  --purpleDim:#ede9fe;
+
+  --text:#0f172a;
+  --text2:#334155;
+  --text3:#64748b;
+  --text4:#94a3b8;
+
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Nunito',sans-serif;
+  --sanss:'Nunito Sans',sans-serif;
+
+  --r:8px;
+  --r2:14px;
+  --r3:22px;
+  --r4:32px;
+
+  --shadow:0 1px 3px rgba(37,99,235,.08),0 4px 16px rgba(37,99,235,.06);
+  --shadow2:0 4px 20px rgba(37,99,235,.12),0 1px 4px rgba(37,99,235,.08);
+  --shadowBlue:0 0 0 3px rgba(37,99,235,.15);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:var(--blue4);}
+
+/* ── LAYOUT ── */
+.shell{display:grid;grid-template-columns:230px 1fr;height:100vh;overflow:hidden;}
+.sidebar{background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;box-shadow:2px 0 12px rgba(37,99,235,.06);}
+.main-area{display:grid;grid-template-rows:60px 1fr;overflow:hidden;background:var(--bg);}
+.topbar{background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px;box-shadow:0 1px 6px rgba(37,99,235,.06);}
+.content{overflow-y:auto;padding:28px;}
+
+/* ── SIDEBAR BRAND ── */
+.brand{padding:24px 20px 20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%);}
+.brand-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 100%);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+.brand-name{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--text);line-height:1.2;}
+.brand-name span{color:var(--blue);}
+.brand-sub{font-size:10.5px;color:var(--text3);margin-top:3px;letter-spacing:.4px;}
+.couple-names{margin-top:10px;font-family:var(--serif);font-size:13px;font-style:italic;color:var(--blue);background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.15);border-radius:20px;padding:4px 12px;display:inline-block;}
+
+/* ── SIDEBAR NAV ── */
+.nav-section{padding:16px 16px 6px;font-size:10px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:1.2px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:var(--r2);margin:1px 8px;cursor:pointer;color:var(--text2);font-size:12.5px;font-weight:600;transition:all .2s;border:1px solid transparent;position:relative;}
+.nav-item:hover{background:var(--bg2);color:var(--blue);border-color:var(--border);}
+.nav-item.active{background:linear-gradient(135deg,var(--blueDim) 0%,#eff6ff 100%);border-color:var(--blue4);color:var(--blue);}
+.nav-item.active::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--blue);border-radius:0 3px 3px 0;}
+.nav-item svg{flex-shrink:0;opacity:.65;}
+.nav-item.active svg{opacity:1;}
+.nav-badge{background:var(--rose);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:20px;margin-left:auto;}
+.nav-spacer{flex:1;}
+
+/* ── SIDEBAR USER ── */
+.nav-user{padding:14px;border-top:1px solid var(--border);background:var(--bg);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2);cursor:pointer;transition:all .15s;}
+.user-card:hover{border-color:var(--blue4);box-shadow:var(--shadowBlue);}
+.user-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:15px;font-weight:600;color:#fff;flex-shrink:0;}
+.user-name{font-size:12.5px;font-weight:700;color:var(--text);}
+.user-role{font-size:10px;color:var(--text3);}
+
+/* ── TOPBAR ── */
+.tb-title{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--text);}
+.tb-title span{color:var(--blue);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-date{font-size:11.5px;color:var(--text3);font-family:var(--sanss);}
+.tb-btn{height:34px;padding:0 14px;border-radius:var(--r2);border:1px solid var(--border2);background:var(--bg1);color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;box-shadow:var(--shadow);}
+.tb-btn:hover{border-color:var(--blue3);color:var(--blue);background:var(--blueDim);}
+.tb-btn.primary{background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 100%);border-color:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(37,99,235,.3);}
+.tb-btn.primary:hover{background:linear-gradient(135deg,var(--blueDeep) 0%,var(--blue) 100%);transform:translateY(-1px);box-shadow:0 5px 14px rgba(37,99,235,.4);}
+.tb-btn.rose{background:linear-gradient(135deg,var(--rose) 0%,#fb7185 100%);border-color:var(--rose);color:#fff;box-shadow:0 3px 10px rgba(244,63,94,.25);}
+.tb-btn.rose:hover{transform:translateY(-1px);}
+
+/* ── PAGES ── */
+.page{display:none;animation:slideUp .3s ease;}
+.page.active{display:block;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.sec-title{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--text);}
+.sec-title span{color:var(--blue);}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border) 0%,transparent 100%);}
+.sec-sub{font-size:12px;color:var(--text3);margin-bottom:20px;margin-top:-12px;}
+
+/* ── CARDS ── */
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r3);padding:22px;box-shadow:var(--shadow);}
+.card:hover{box-shadow:var(--shadow2);}
+.card-blue{border-color:var(--blue4);background:linear-gradient(135deg,#fff 0%,var(--blueDim) 100%);}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;}
+.card-action{font-size:11.5px;color:var(--blue);cursor:pointer;background:none;border:none;font-family:var(--sans);font-weight:600;padding:0;}
+.card-action:hover{color:var(--blueDeep);}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stats-grid.g3{grid-template-columns:repeat(3,1fr);}
+.stats-grid.g5{grid-template-columns:repeat(5,1fr);}
+.stat-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;box-shadow:var(--shadow);transition:all .2s;position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;opacity:.05;}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow2);}
+.stat-card.blue::after{background:var(--blue);}
+.stat-card.rose::after{background:var(--rose);}
+.stat-card.green::after{background:var(--green);}
+.stat-card.amber::after{background:var(--amber);}
+.stat-label{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
+.stat-val{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--text);letter-spacing:-.5px;}
+.stat-val.blue{color:var(--blue);}
+.stat-val.rose{color:var(--rose);}
+.stat-val.green{color:var(--green);}
+.stat-val.amber{color:var(--amber);}
+.stat-val.red{color:var(--red);}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:5px;display:flex;align-items:center;gap:5px;}
+.delta{font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:6px;}
+.delta.up{background:var(--greenDim);color:var(--green);}
+.delta.dn{background:var(--redDim);color:var(--red);}
+
+/* ── GRID LAYOUTS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.g3c{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+.g65{display:grid;grid-template-columns:1.65fr 1fr;gap:16px;margin-bottom:16px;}
+.g56{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;margin-bottom:16px;}
+
+/* ── TABLES ── */
+.tbl-wrap{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow);}
+.tbl-wrap table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.tbl-wrap th{padding:11px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;background:var(--bg2);border-bottom:1px solid var(--border);}
+.tbl-wrap td{padding:12px 14px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl-wrap tr:last-child td{border-bottom:none;}
+.tbl-wrap tr:hover td{background:var(--bg);}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:10.5px;font-weight:700;font-family:var(--sanss);}
+.b-done{background:var(--greenDim);color:var(--green);}
+.b-proses{background:var(--blueDim);color:var(--blue);}
+.b-pending{background:var(--amberDim);color:var(--amber);}
+.b-cancel{background:var(--redDim);color:var(--red);}
+.b-lunas{background:var(--greenDim);color:var(--green);}
+.b-dp{background:var(--blueDim);color:var(--blue);}
+.b-belum{background:var(--redDim);color:var(--red);}
+.b-penting{background:var(--roseDim);color:var(--rose);}
+
+/* ── PROGRESS BAR ── */
+.prog{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:6px;}
+.prog-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.prog-fill.blue{background:linear-gradient(90deg,var(--blue) 0%,var(--sky) 100%);}
+.prog-fill.green{background:linear-gradient(90deg,var(--green) 0%,#34d399 100%);}
+.prog-fill.rose{background:linear-gradient(90deg,var(--rose) 0%,#fb7185 100%);}
+.prog-fill.amber{background:linear-gradient(90deg,var(--amber) 0%,var(--goldSoft) 100%);}
+.prog-fill.red{background:linear-gradient(90deg,var(--red) 0%,#f87171 100%);}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:12px;}
+.form-group label{display:block;font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;height:38px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:13px;padding:0 12px;outline:none;transition:all .2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--blue3);background:var(--bg1);box-shadow:var(--shadowBlue);}
+.form-group select option{background:var(--bg1);}
+.form-group textarea{height:80px;padding:10px 12px;resize:none;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.tb-input{height:36px;background:var(--bg1);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:12.5px;padding:0 12px;outline:none;flex:1;min-width:140px;transition:all .2s;}
+.tb-input:focus{border-color:var(--blue3);box-shadow:var(--shadowBlue);}
+.tb-sel{height:36px;background:var(--bg1);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:12.5px;padding:0 10px;outline:none;transition:all .2s;cursor:pointer;}
+.tb-sel option{background:var(--bg1);}
+
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r3);padding:28px;width:480px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(15,23,42,.2);animation:modalIn .25s ease;}
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(14px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-title{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:20px;color:var(--text);display:flex;align-items:center;gap:10px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:22px;padding-top:16px;border-top:1px solid var(--border);}
+.btn-cancel{height:38px;padding:0 18px;border-radius:var(--r2);border:1.5px solid var(--border2);background:none;color:var(--text2);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-cancel:hover{background:var(--bg2);}
+.btn-blue{height:38px;padding:0 22px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 100%);color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(37,99,235,.3);}
+.btn-blue:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(37,99,235,.4);}
+.btn-rose{height:38px;padding:0 22px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--rose) 0%,#fb7185 100%);color:#fff;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;}
+.btn-rose:hover{transform:translateY(-1px);}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2);padding:11px 16px;font-size:12.5px;display:flex;align-items:center;gap:9px;min-width:260px;box-shadow:0 8px 30px rgba(15,23,42,.15);animation:toastIn .25s ease;}
+.toast.out{animation:toastOut .25s ease forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:translateX(0);}}
+@keyframes toastOut{to{opacity:0;transform:translateX(16px);}}
+.toast-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.toast.ok .toast-dot{background:var(--green);}
+.toast.err .toast-dot{background:var(--red);}
+.toast.info .toast-dot{background:var(--blue);}
+
+/* ── BAR CHART ── */
+.bar-chart{display:flex;flex-direction:column;gap:10px;}
+.bar-row{display:flex;align-items:center;gap:10px;font-size:12px;}
+.bar-lbl{width:120px;color:var(--text2);text-align:right;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-bg{flex:1;height:24px;background:var(--bg2);border-radius:5px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding-left:8px;min-width:4px;transition:width .7s ease;}
+.bar-fill span{font-size:10.5px;font-weight:700;color:#fff;white-space:nowrap;}
+
+/* ── CHECKLIST ── */
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:8px;transition:all .15s;cursor:pointer;}
+.check-item:hover{border-color:var(--blue4);background:var(--blueDim);}
+.check-item.done{background:var(--greenDim);border-color:#86efac;opacity:.85;}
+.check-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--blue3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .2s;}
+.check-item.done .check-box{background:var(--green);border-color:var(--green);}
+.check-name{font-size:13px;font-weight:600;color:var(--text);}
+.check-item.done .check-name{text-decoration:line-through;color:var(--text3);}
+.check-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.check-badge{margin-left:auto;flex-shrink:0;}
+
+/* ── VENDOR CARD ── */
+.vendor-card{background:var(--bg1);border:1.5px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:10px;transition:all .2s;position:relative;}
+.vendor-card:hover{border-color:var(--blue4);box-shadow:var(--shadow2);}
+.vendor-cat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
+
+/* ── TAMU CARD ── */
+.tamu-row{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;}
+.tamu-row:hover{background:var(--bg2);}
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-left:28px;}
+.timeline::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--blue3),var(--border));}
+.tl-item{position:relative;margin-bottom:16px;}
+.tl-dot{position:absolute;left:-23px;top:4px;width:14px;height:14px;border-radius:50%;border:2.5px solid var(--blue3);background:var(--bg1);transition:all .2s;}
+.tl-dot.done{background:var(--green);border-color:var(--green);}
+.tl-dot.late{background:var(--red);border-color:var(--red);}
+.tl-box{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r2);padding:12px 16px;cursor:pointer;transition:all .15s;}
+.tl-box:hover{border-color:var(--blue4);box-shadow:var(--shadow);}
+.tl-box.done{border-color:#86efac;background:var(--greenDim);}
+.tl-date{font-size:10.5px;color:var(--text3);font-family:var(--sanss);margin-bottom:3px;}
+.tl-title{font-size:13px;font-weight:700;color:var(--text);}
+.tl-desc{font-size:11.5px;color:var(--text3);margin-top:2px;}
+
+/* ── GOAL PROGRESS ── */
+.goal-card{background:var(--bg1);border:1.5px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:10px;}
+.goal-cat{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.goal-name{font-size:13px;font-weight:700;color:var(--text);}
+.goal-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.goal-amounts{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px;}
+
+/* ── AUTH STYLES ── */
+.auth-panel{display:none;}.auth-panel.active{display:block;animation:slideUp .3s ease;}
+.auth-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r3);padding:30px 28px 26px;width:400px;text-align:left;box-shadow:var(--shadow2);}
+.auth-card-title{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:4px;color:var(--text);}
+.auth-card-sub{font-size:12px;color:var(--text3);margin-bottom:22px;}
+.pw-wrap{position:relative;}.pw-wrap input{padding-right:44px!important;}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;line-height:0;transition:color .15s;}
+.pw-toggle:hover{color:var(--blue);}
+.auth-link{background:none;border:none;color:var(--blue);font-family:var(--sans);font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
+.auth-link:hover{color:var(--blueDeep);}
+.auth-err{display:none;background:var(--redDim);border:1px solid #fca5a5;border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--red);margin-bottom:14px;}
+.auth-err.show{display:flex;align-items:center;gap:8px;animation:slideUp .2s ease;}
+.auth-ok{display:none;background:var(--greenDim);border:1px solid #86efac;border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--green);margin-bottom:14px;}
+.auth-ok.show{display:flex;align-items:center;gap:8px;}
+.acc-item{display:flex;align-items:center;gap:12px;padding:10px 13px;border-radius:var(--r2);background:var(--bg);border:1.5px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.acc-item:hover{border-color:var(--blue3);background:var(--blueDim);}
+.acc-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;font-weight:600;color:#fff;flex-shrink:0;}
+.strength-bar{display:flex;gap:3px;margin-top:6px;}
+.strength-seg{height:3px;flex:1;border-radius:2px;background:var(--bg3);transition:background .3s;}
+.strength-seg.weak{background:var(--red);}.strength-seg.medium{background:var(--amber);}.strength-seg.strong{background:var(--green);}
+.auth-divider{display:flex;align-items:center;gap:8px;margin:14px 0;}
+.auth-divider-line{flex:1;height:1px;background:var(--border);}
+.auth-divider-txt{font-size:11px;color:var(--text3);}
+.btn-auth{width:100%;height:44px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 100%);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+.btn-auth:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,99,235,.4);}
+.btn-auth-sec{width:100%;height:38px;border-radius:var(--r);border:1.5px solid var(--border2);background:none;color:var(--text2);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;transition:all .15s;}
+.btn-auth-sec:hover{background:var(--bg2);border-color:var(--blue4);color:var(--blue);}
+.xlsx-note{background:var(--blueDim);border:1px solid var(--blue4);border-radius:var(--r);padding:10px 12px;font-size:12px;color:var(--blue2);margin-top:12px;display:flex;align-items:flex-start;gap:8px;}
+.input-hint{font-size:11px;color:var(--text3);margin-top:5px;}
+.badge-role{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.badge-owner{background:var(--blueDim);color:var(--blue);}
+.badge-admin{background:var(--greenDim);color:var(--green);}
+.badge-user{background:var(--bg3);color:var(--text3);}
+</style>
+</head>
+<body>
+
+<!-- ══ SHELL ══ -->
+<div class="shell" id="app-shell" style="display:none">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </div>
+    <div class="brand-name">maNTapps <span>Wedding</span></div>
+    <div class="brand-sub">Budgeting Pernikahan Modern</div>
+    <div class="couple-names" id="sb-couple">✦ Nama & Pasangan ✦</div>
+  </div>
+
+  <div class="nav-section">Menu Utama</div>
+  <div class="nav-item active" onclick="goPage('dashboard',this)" data-page="dashboard">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+  </div>
+  <div class="nav-item" onclick="goPage('budget',this)" data-page="budget">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Budget & Pengeluaran
+  </div>
+  <div class="nav-item" onclick="goPage('dokumen',this)" data-page="dokumen">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Dokumen & KUA
+    <span class="nav-badge" id="badge-dokumen">0</span>
+  </div>
+  <div class="nav-item" onclick="goPage('vendor',this)" data-page="vendor">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Vendor & Jasa
+  </div>
+  <div class="nav-item" onclick="goPage('tamu',this)" data-page="tamu">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Daftar Tamu
+  </div>
+  <div class="nav-item" onclick="goPage('timeline',this)" data-page="timeline">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Timeline & Checklist
+  </div>
+  <div class="nav-item" onclick="goPage('laporan',this)" data-page="laporan">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Laporan Keuangan
+  </div>
+  <div class="nav-section">Lainnya</div>
+  <div class="nav-item" onclick="goPage('pengaturan',this)" data-page="pengaturan">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Pengaturan
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-user">
+    <div class="user-card" onclick="goPage('pengaturan',document.querySelector('[data-page=pengaturan]'))">
+      <div class="user-av" id="sb-av">A</div>
+      <div><div class="user-name" id="sb-name">Admin</div><div class="user-role" id="sb-role">Owner</div></div>
+    </div>
+  </div>
+</div><!-- /sidebar -->
+
+<!-- MAIN -->
+<div class="main-area">
+<div class="topbar">
+  <div class="tb-title" id="tb-title">Dashboard <span>Pernikahan</span></div>
+  <div class="tb-right">
+    <div class="tb-date" id="tb-date"></div>
+    <div id="sync-status" style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:20px">
+      <div id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green)"></div>
+      <span id="sync-txt">Tersimpan</span>
+    </div>
+    <button class="tb-btn" onclick="openModal('modal-sinkron');switchSyncTab('export')" style="display:flex;align-items:center;gap:6px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Sinkron
+    </button>
+    <button class="tb-btn" onclick="exportXLSX()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Ekspor XLSX
+    </button>
+    <button class="tb-btn primary" id="btn-add-main" onclick="openAddMain()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Tambah
+    </button>
+  </div>
+</div>
+<div class="content">
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page active" id="page-dashboard">
+  <div id="dash-hitung-mundur" style="background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 50%,#38bdf8 100%);border-radius:var(--r3);padding:24px 28px;margin-bottom:22px;color:#fff;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 24px rgba(37,99,235,.35);">
+    <div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-bottom:4px">Hari Menuju Pernikahan</div>
+      <div style="font-family:var(--serif);font-size:48px;font-weight:300;letter-spacing:-2px;" id="dash-countdown">—</div>
+      <div style="font-size:13px;opacity:.85;margin-top:4px" id="dash-wedding-date">Tanggal belum diset</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:var(--serif);font-size:26px;font-style:italic;opacity:.9" id="dash-couple-banner">✦ Nama & Pasangan ✦</div>
+      <div style="font-size:12px;opacity:.7;margin-top:6px">maNTapps Wedding Planner</div>
+    </div>
+  </div>
+  <div class="stats-grid g5" id="dash-stats"></div>
+  <div class="g65">
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-hdr"><span class="card-title">Budget per Kategori</span><button class="card-action" onclick="goPage('budget',document.querySelector('[data-page=budget]'))">Kelola →</button></div>
+        <div class="bar-chart" id="dash-budget-chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title">Checklist Mendekati</span><button class="card-action" onclick="goPage('timeline',document.querySelector('[data-page=timeline]'))">Lihat Semua →</button></div>
+        <div id="dash-checklist"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-hdr"><span class="card-title">Status Dokumen</span></div>
+        <div id="dash-dokumen"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title">Vendor Terkonfirmasi</span></div>
+        <div id="dash-vendor"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BUDGET ═══ -->
+<div class="page" id="page-budget">
+  <div class="toolbar">
+    <input type="text" class="tb-input" id="bud-srch" placeholder="Cari item budget..." oninput="renderBudget()">
+    <select class="tb-sel" id="bud-kat" onchange="renderBudget()"><option value="">Semua Kategori</option></select>
+    <select class="tb-sel" id="bud-status" onchange="renderBudget()">
+      <option value="">Semua Status</option><option>Belum Bayar</option><option>DP</option><option>Lunas</option>
+    </select>
+    <button class="tb-btn primary" onclick="openModal('modal-budget')">+ Tambah Item</button>
+  </div>
+  <div class="stats-grid g5" id="bud-stats"></div>
+  <div class="tbl-wrap" style="margin-bottom:16px">
+    <table><thead><tr>
+      <th>Nama Item</th><th>Kategori</th><th>Budget (Rp)</th><th>Realisasi (Rp)</th><th>Selisih</th><th>Status Bayar</th><th>Vendor</th><th>Aksi</th>
+    </tr></thead>
+    <tbody id="bud-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- ═══ DOKUMEN ═══ -->
+<div class="page" id="page-dokumen">
+  <div class="toolbar">
+    <button class="tb-btn primary" onclick="openModal('modal-dokumen')">+ Tambah Dokumen</button>
+    <select class="tb-sel" id="dok-filter" onchange="renderDokumen()">
+      <option value="">Semua</option><option value="Belum">Belum Selesai</option><option value="Selesai">Sudah Selesai</option>
+    </select>
+  </div>
+  <div class="stats-grid g3" id="dok-stats"></div>
+  <div class="g2" id="dok-list"></div>
+</div>
+
+<!-- ═══ VENDOR ═══ -->
+<div class="page" id="page-vendor">
+  <div class="toolbar">
+    <input type="text" class="tb-input" id="vnd-srch" placeholder="Cari vendor..." oninput="renderVendor()">
+    <select class="tb-sel" id="vnd-kat" onchange="renderVendor()"><option value="">Semua Kategori</option></select>
+    <select class="tb-sel" id="vnd-status" onchange="renderVendor()">
+      <option value="">Semua Status</option><option>Kandidat</option><option>Disurvei</option><option>Konfirmasi</option><option>Batal</option>
+    </select>
+    <button class="tb-btn primary" onclick="openModal('modal-vendor')">+ Tambah Vendor</button>
+  </div>
+  <div class="stats-grid" id="vnd-stats"></div>
+  <div class="g2" id="vnd-list"></div>
+</div>
+
+<!-- ═══ TAMU ═══ -->
+<div class="page" id="page-tamu">
+  <div class="toolbar">
+    <input type="text" class="tb-input" id="tamu-srch" placeholder="Cari tamu..." oninput="renderTamu()">
+    <select class="tb-sel" id="tamu-kel" onchange="renderTamu()"><option value="">Semua Kelompok</option></select>
+    <select class="tb-sel" id="tamu-konfirm" onchange="renderTamu()">
+      <option value="">Semua</option><option value="Hadir">Konfirmasi Hadir</option><option value="Tidak">Tidak Hadir</option><option value="Belum">Belum Konfirmasi</option>
+    </select>
+    <button class="tb-btn primary" onclick="openModal('modal-tamu')">+ Tambah Tamu</button>
+    <button class="tb-btn" onclick="importTamu()">Import CSV</button>
+  </div>
+  <div class="stats-grid g5" id="tamu-stats"></div>
+  <div class="tbl-wrap">
+    <table><thead><tr>
+      <th>No.</th><th>Nama Tamu</th><th>Kelompok</th><th>Jumlah Hadir</th><th>Konfirmasi</th><th>Kontak</th><th>Catatan</th><th>Aksi</th>
+    </tr></thead>
+    <tbody id="tamu-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- ═══ TIMELINE ═══ -->
+<div class="page" id="page-timeline">
+  <div class="toolbar">
+    <select class="tb-sel" id="tl-filter" onchange="renderTimeline()">
+      <option value="">Semua</option><option value="Belum">Belum Selesai</option><option value="Selesai">Sudah Selesai</option><option value="Terlambat">Terlambat</option>
+    </select>
+    <button class="tb-btn primary" onclick="openModal('modal-timeline')">+ Tambah Tugas</button>
+  </div>
+  <div class="stats-grid g3" id="tl-stats"></div>
+  <div class="g56" id="tl-content">
+    <div class="card"><div class="card-hdr"><span class="card-title">Timeline Tugas</span></div><div id="tl-list" class="timeline"></div></div>
+    <div id="tl-right"></div>
+  </div>
+</div>
+
+<!-- ═══ LAPORAN ═══ -->
+<div class="page" id="page-laporan">
+  <div class="toolbar">
+    <button class="tb-btn" onclick="exportXLSX()">Ekspor Lengkap XLSX</button>
+  </div>
+  <div class="stats-grid" id="lap-stats"></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Budget vs Realisasi per Kategori</span></div>
+      <canvas id="lap-chart" height="220"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Distribusi Budget</span></div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <canvas id="lap-donut" width="150" height="150" style="flex-shrink:0"></canvas>
+        <div id="lap-legend" style="flex:1"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-hdr"><span class="card-title">Rincian Budget Lengkap</span></div>
+    <div class="tbl-wrap" style="border:none;box-shadow:none">
+      <table><thead><tr><th>Kategori</th><th>Item</th><th>Budget</th><th>Realisasi</th><th>Selisih</th><th>Status</th></tr></thead>
+      <tbody id="lap-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PENGATURAN ═══ -->
+<div class="page" id="page-pengaturan">
+  <div class="g2">
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-hdr"><span class="card-title">Profil Pernikahan</span></div>
+        <div class="form-group"><label>Nama Mempelai Pria</label><input type="text" id="set-pria" placeholder="Nama lengkap"></div>
+        <div class="form-group"><label>Nama Mempelai Wanita</label><input type="text" id="set-wanita" placeholder="Nama lengkap"></div>
+        <div class="form-group"><label>Tanggal Pernikahan</label><input type="date" id="set-tgl-nikah"></div>
+        <div class="form-group"><label>Lokasi Pernikahan</label><input type="text" id="set-lokasi" placeholder="Gedung / alamat acara"></div>
+        <div class="form-group"><label>Total Budget Keseluruhan (Rp)</label><input type="number" id="set-total-budget" placeholder="0"></div>
+        <button class="btn-blue" style="width:100%;height:40px;font-size:13px" onclick="savePengaturan()">Simpan Profil</button>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title">Akun Pengguna</span></div>
+        <div id="set-user-info" style="margin-bottom:14px"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="tb-btn" style="height:38px;justify-content:center;color:var(--blue);border-color:var(--blue4)" onclick="openModal('modal-ganti-pw')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Ganti Password
+          </button>
+          <button class="tb-btn" style="height:38px;justify-content:center;color:var(--red);border-color:#fca5a5" onclick="doLogout()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout
+          </button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-hdr"><span class="card-title">Info Sistem</span></div>
+        <div id="set-sysinfo"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title">Manajemen Data</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn-blue" style="width:100%;height:38px;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px" onclick="openModal('modal-sinkron');switchSyncTab('export')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Sinkronisasi Antar Device
+          </button>
+          <button class="tb-btn" style="height:38px;justify-content:center" onclick="exportXLSX()">Ekspor Database XLSX</button>
+          <button class="tb-btn" style="height:38px;justify-content:center" onclick="backupJSON()">Backup Data (JSON)</button>
+          <button class="tb-btn" style="height:38px;justify-content:center" onclick="importJSON()">Import Data (JSON)</button>
+          <div style="height:1px;background:var(--border);margin:2px 0"></div>
+          <button class="tb-btn" style="height:38px;justify-content:center;color:var(--red);border-color:#fca5a5" onclick="resetData()">Reset Semua Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main-area -->
+</div><!-- /shell -->
+
+<!-- ══ MODALS ══ -->
+<div class="modal-overlay" id="modal-budget">
+<div class="modal-box">
+  <div class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span id="modal-budget-title">Tambah Item Budget</span></div>
+  <div class="form-row">
+    <div class="form-group"><label>Nama Item</label><input type="text" id="bf-nama" placeholder="cth: Gedung, Catering..."></div>
+    <div class="form-group"><label>Kategori</label><select id="bf-kat"></select></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Budget Rencana (Rp)</label><input type="number" id="bf-budget" min="0" placeholder="0"></div>
+    <div class="form-group"><label>Realisasi Bayar (Rp)</label><input type="number" id="bf-realisasi" min="0" placeholder="0"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Status Pembayaran</label>
+      <select id="bf-status"><option>Belum Bayar</option><option>DP</option><option>Lunas</option></select>
+    </div>
+    <div class="form-group"><label>Nama Vendor/Toko</label><input type="text" id="bf-vendor" placeholder="Nama vendor"></div>
+  </div>
+  <div class="form-group"><label>Catatan</label><textarea id="bf-catatan" placeholder="Catatan tambahan..."></textarea></div>
+  <div class="modal-actions">
+    <button class="btn-cancel" onclick="closeModal('modal-budget')">Batal</button>
+    <button class="btn-blue" onclick="saveBudget()">Simpan</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-dokumen">
+<div class="modal-box">
+  <div class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Tambah Dokumen</div>
+  <div class="form-row">
+    <div class="form-group"><label>Nama Dokumen</label><input type="text" id="df-nama" placeholder="cth: Surat N1, KTP..."></div>
+    <div class="form-group"><label>Jenis</label>
+      <select id="df-jenis"><option>KUA & Sipil</option><option>Identitas</option><option>Keluarga</option><option>Kesehatan</option><option>Lainnya</option></select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Untuk</label>
+      <select id="df-untuk"><option>Pria</option><option>Wanita</option><option>Keduanya</option><option>Saksi</option></select>
+    </div>
+    <div class="form-group"><label>Deadline</label><input type="date" id="df-deadline"></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Status</label>
+      <select id="df-status"><option>Belum Diurus</option><option>Sedang Diurus</option><option>Selesai</option></select>
+    </div>
+    <div class="form-group"><label>Prioritas</label>
+      <select id="df-prioritas"><option>Wajib</option><option>Penting</option><option>Opsional</option></select>
+    </div>
+  </div>
+  <div class="form-group"><label>Catatan / Instruksi</label><textarea id="df-catatan" placeholder="Cara mendapatkan, instansi terkait..."></textarea></div>
+  <div class="modal-actions">
+    <button class="btn-cancel" onclick="closeModal('modal-dokumen')">Batal</button>
+    <button class="btn-blue" onclick="saveDokumen()">Simpan</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-vendor">
+<div class="modal-box">
+  <div class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span id="modal-vendor-title">Tambah Vendor</span></div>
+  <div class="form-row">
+    <div class="form-group"><label>Nama Vendor</label><input type="text" id="vf-nama" placeholder="Nama vendor/jasa"></div>
+    <div class="form-group"><label>Kategori</label>
+      <select id="vf-kat"><option>Gedung & Venue</option><option>Catering</option><option>Dekorasi</option><option>Fotografer</option><option>Videografer</option><option>Makeup & Busana</option><option>MC & Hiburan</option><option>Undangan</option><option>Transportasi</option><option>Dokumentasi</option><option>Katering Prasmanan</option><option>Lainnya</option></select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Harga Penawaran (Rp)</label><input type="number" id="vf-harga" min="0" placeholder="0"></div>
+    <div class="form-group"><label>Status</label>
+      <select id="vf-status"><option>Kandidat</option><option>Disurvei</option><option>Konfirmasi</option><option>Batal</option></select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Kontak / No. HP</label><input type="text" id="vf-kontak" placeholder="08xx-xxxx-xxxx"></div>
+    <div class="form-group"><label>Rating (1-5)</label><input type="number" id="vf-rating" min="1" max="5" value="5"></div>
+  </div>
+  <div class="form-group"><label>Alamat / Lokasi</label><input type="text" id="vf-alamat" placeholder="Alamat vendor"></div>
+  <div class="form-group"><label>Catatan</label><textarea id="vf-catatan" placeholder="Kelebihan, kekurangan, negosiasi..."></textarea></div>
+  <div class="modal-actions">
+    <button class="btn-cancel" onclick="closeModal('modal-vendor')">Batal</button>
+    <button class="btn-blue" onclick="saveVendor()">Simpan</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-tamu">
+<div class="modal-box">
+  <div class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Tambah Tamu</div>
+  <div class="form-row">
+    <div class="form-group"><label>Nama Tamu</label><input type="text" id="tf-nama" placeholder="Nama lengkap"></div>
+    <div class="form-group"><label>Kelompok</label>
+      <select id="tf-kel"><option>Keluarga Pria</option><option>Keluarga Wanita</option><option>Teman Pria</option><option>Teman Wanita</option><option>Kolega</option><option>Tetangga</option><option>Lainnya</option></select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Jumlah Tamu (termasuk pasangan)</label><input type="number" id="tf-jml" min="1" value="1"></div>
+    <div class="form-group"><label>Konfirmasi Kehadiran</label>
+      <select id="tf-konfirm"><option>Belum Konfirmasi</option><option>Hadir</option><option>Tidak Hadir</option></select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>No. HP / WA</label><input type="text" id="tf-kontak" placeholder="08xx-xxxx-xxxx"></div>
+    <div class="form-group"><label>Undangan Terkirim</label>
+      <select id="tf-undangan"><option value="Belum">Belum</option><option value="Sudah">Sudah</option></select>
+    </div>
+  </div>
+  <div class="form-group"><label>Catatan</label><input type="text" id="tf-catatan" placeholder="Alergi makanan, kebutuhan khusus..."></div>
+  <div class="modal-actions">
+    <button class="btn-cancel" onclick="closeModal('modal-tamu')">Batal</button>
+    <button class="btn-blue" onclick="saveTamu()">Simpan</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-timeline">
+<div class="modal-box">
+  <div class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="modal-tl-title">Tambah Tugas</span></div>
+  <div class="form-group"><label>Nama Tugas</label><input type="text" id="tlf-nama" placeholder="cth: Booking gedung, Beli cincin..."></div>
+  <div class="form-row">
+    <div class="form-group"><label>Deadline</label><input type="date" id="tlf-deadline"></div>
+    <div class="form-group"><label>Kategori</label>
+      <select id="tlf-kat"><option>Dokumen</option><option>Venue & Gedung</option><option>Catering</option><option>Busana</option><option>Dekorasi</option><option>Undangan</option><option>Fotografer</option><option>Hiburan</option><option>Akomodasi</option><option>Lainnya</option></select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Prioritas</label>
+      <select id="tlf-prioritas"><option>Tinggi</option><option>Sedang</option><option>Rendah</option></select>
+    </div>
+    <div class="form-group"><label>Status</label>
+      <select id="tlf-status"><option>Belum</option><option>Sedang</option><option>Selesai</option></select>
+    </div>
+  </div>
+  <div class="form-group"><label>Catatan</label><textarea id="tlf-catatan" placeholder="Detail tugas..."></textarea></div>
+  <div class="modal-actions">
+    <button class="btn-cancel" onclick="closeModal('modal-timeline')">Batal</button>
+    <button class="btn-blue" onclick="saveTimeline()">Simpan</button>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-ganti-pw">
+<div class="modal-box" style="width:400px">
+  <div class="modal-title">Ganti Password</div>
+  <div id="gpw-err" style="display:none;background:var(--redDim);border:1px solid #fca5a5;border-radius:var(--r);padding:8px 12px;font-size:12px;color:var(--red);margin-bottom:14px;align-items:center;gap:8px"><span id="gpw-err-txt"></span></div>
+  <div class="form-group"><label>Password Lama</label><div class="pw-wrap"><input type="password" id="gpw-lama" placeholder="Password saat ini"><button class="pw-toggle" onclick="togglePwVis('gpw-lama','eye-g1')"><svg id="eye-g1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+  <div class="form-group"><label>Password Baru</label><div class="pw-wrap"><input type="password" id="gpw-baru" placeholder="Min. 6 karakter" oninput="checkStrength('gpw-baru','gpw-strength')"><button class="pw-toggle" onclick="togglePwVis('gpw-baru','eye-g2')"><svg id="eye-g2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div><div class="strength-bar" id="gpw-strength"><div class="strength-seg"></div><div class="strength-seg"></div><div class="strength-seg"></div></div></div>
+  <div class="form-group" style="margin-bottom:0"><label>Konfirmasi Password</label><div class="pw-wrap"><input type="password" id="gpw-konfirm" placeholder="Ulangi password baru"><button class="pw-toggle" onclick="togglePwVis('gpw-konfirm','eye-g3')"><svg id="eye-g3" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+  <div class="modal-actions">
+    <button class="btn-cancel" onclick="closeModal('modal-ganti-pw');['gpw-lama','gpw-baru','gpw-konfirm'].forEach(id=>document.getElementById(id).value='')">Batal</button>
+    <button class="btn-blue" onclick="gantiPassword()">Simpan Password</button>
+  </div>
+</div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen" style="position:fixed;inset:0;background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 50%,#e0f2fe 100%);display:flex;align-items:center;justify-content:center;z-index:9999;overflow-y:auto;padding:24px 16px">
+<div style="text-align:center;width:100%;max-width:420px">
+  <div style="margin-bottom:30px">
+    <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--blue) 0%,var(--sky) 100%);border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 28px rgba(37,99,235,.35)">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </div>
+    <div style="font-family:var(--serif);font-size:28px;font-weight:600;color:var(--text)">maNTapps <span style="color:var(--blue)">Wedding</span></div>
+    <div style="font-size:12px;color:var(--text3);margin-top:5px">Budgeting Pernikahan Modern</div>
+    <div style="font-size:11px;color:var(--blue2);margin-top:8px;background:var(--blueDim);border:1px solid var(--blue4);border-radius:20px;padding:4px 14px;display:inline-block">
+      ☁️ Data tersimpan di cloud — akses dari device manapun
+    </div>
+  </div>
+  <div id="panel-pilih" class="auth-panel active">
+    <div class="auth-card">
+      <div class="auth-card-title">Pilih Akun</div>
+      <div class="auth-card-sub">Klik akun untuk lanjut masuk</div>
+      <div id="auth-akun-list"></div>
+      <div class="auth-divider"><div class="auth-divider-line"></div><span class="auth-divider-txt">atau masuk manual</span><div class="auth-divider-line"></div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-auth" style="flex:1;height:40px;font-size:13px" onclick="showPanel('panel-login')">Masuk dengan Email</button>
+        <button class="btn-auth-sec" style="flex:0;height:40px;margin:0;padding:0 16px;white-space:nowrap" onclick="showPanel('panel-daftar')">+ Daftar</button>
+      </div>
+    </div>
+  </div>
+  <div id="panel-login" class="auth-panel">
+    <div class="auth-card">
+      <div class="auth-card-title">Masuk</div>
+      <div class="auth-card-sub">Gunakan email dan password Anda</div>
+      <div id="login-err" class="auth-err"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span id="login-err-txt"></span></div>
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="nama@email.com" autocomplete="email"></div>
+      <div class="form-group" style="margin-bottom:6px"><label>Password</label><div class="pw-wrap"><input type="password" id="login-pw" placeholder="Masukkan password"><button class="pw-toggle" onclick="togglePwVis('login-pw','eye-lp')"><svg id="eye-lp" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:18px"><button class="auth-link" onclick="showPanel('panel-lupa')">Lupa password?</button></div>
+      <button class="btn-auth" onclick="doLogin()">MASUK</button>
+      <div class="auth-divider"><div class="auth-divider-line"></div><span class="auth-divider-txt">belum punya akun?</span><div class="auth-divider-line"></div></div>
+      <button class="btn-auth-sec" onclick="showPanel('panel-daftar')">Buat Akun Baru</button>
+      <button class="btn-auth-sec" style="margin-top:6px;font-size:12px" onclick="showPanel('panel-pilih')">← Pilih Akun</button>
+    </div>
+  </div>
+  <div id="panel-lupa" class="auth-panel">
+    <div class="auth-card">
+      <div class="auth-card-title">Reset Password</div>
+      <div class="auth-card-sub">Verifikasi email dan kode pemulihan</div>
+      <div id="lupa-err" class="auth-err"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span id="lupa-err-txt"></span></div>
+      <div id="lupa-ok" class="auth-ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span id="lupa-ok-txt"></span></div>
+      <div id="lupa-step1">
+        <div class="form-group"><label>Email Terdaftar</label><input type="email" id="lupa-email" placeholder="email@domain.com"></div>
+        <div class="form-group" style="margin-bottom:18px"><label>Kode Pemulihan</label><input type="text" id="lupa-kode" placeholder="Kode pemulihan Anda" style="text-transform:uppercase;letter-spacing:2px" oninput="this.value=this.value.toUpperCase()"><div class="input-hint">Default: <span style="color:var(--blue);font-weight:700">WEDDING2024</span></div></div>
+        <button class="btn-auth" onclick="verifikasiPemulihan()">Verifikasi</button>
+      </div>
+      <div id="lupa-step2" style="display:none">
+        <div class="form-group"><label>Password Baru</label><div class="pw-wrap"><input type="password" id="lupa-pw-baru" placeholder="Min. 6 karakter" oninput="checkStrength('lupa-pw-baru','lupa-str')"><button class="pw-toggle" onclick="togglePwVis('lupa-pw-baru','eye-lb1')"><svg id="eye-lb1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div><div class="strength-bar" id="lupa-str"><div class="strength-seg"></div><div class="strength-seg"></div><div class="strength-seg"></div></div></div>
+        <div class="form-group" style="margin-bottom:18px"><label>Konfirmasi</label><div class="pw-wrap"><input type="password" id="lupa-pw-konfirm" placeholder="Ulangi"><button class="pw-toggle" onclick="togglePwVis('lupa-pw-konfirm','eye-lb2')"><svg id="eye-lb2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+        <button class="btn-auth" onclick="resetPassword()">Simpan Password</button>
+      </div>
+      <button class="btn-auth-sec" onclick="showPanel('panel-login')">← Kembali</button>
+    </div>
+  </div>
+  <div id="panel-daftar" class="auth-panel">
+    <div class="auth-card">
+      <div class="auth-card-title">Buat Akun Baru</div>
+      <div class="auth-card-sub">Daftarkan akun maNTapps Wedding</div>
+      <div id="daftar-err" class="auth-err"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span id="daftar-err-txt"></span></div>
+      <div class="form-row"><div class="form-group"><label>Nama Lengkap</label><input type="text" id="daftar-nama" placeholder="Nama Anda"></div>
+        <div class="form-group"><label>Role</label><select id="daftar-role" style="width:100%;height:38px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:13px;padding:0 12px;outline:none"><option value="user">User</option><option value="admin">Admin</option><option value="owner">Owner</option></select></div></div>
+      <div class="form-group"><label>Email</label><input type="email" id="daftar-email" placeholder="nama@email.com"></div>
+      <div class="form-group"><label>Password</label><div class="pw-wrap"><input type="password" id="daftar-pw" placeholder="Min. 6 karakter" oninput="checkStrength('daftar-pw','daftar-str')"><button class="pw-toggle" onclick="togglePwVis('daftar-pw','eye-d1')"><svg id="eye-d1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div><div class="strength-bar" id="daftar-str"><div class="strength-seg"></div><div class="strength-seg"></div><div class="strength-seg"></div></div></div>
+      <div class="form-group"><label>Konfirmasi Password</label><div class="pw-wrap"><input type="password" id="daftar-konfirm" placeholder="Ulangi password"><button class="pw-toggle" onclick="togglePwVis('daftar-konfirm','eye-d2')"><svg id="eye-d2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="form-group" style="margin-bottom:14px"><label>Kode Pemulihan</label><input type="text" id="daftar-kode" placeholder="Buat kode unik" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"><div class="input-hint">Untuk reset password jika lupa. Simpan baik-baik!</div></div>
+      <button class="btn-auth" onclick="buatAkun()">BUAT AKUN & UNDUH DATABASE</button>
+      <div class="xlsx-note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>File XLSX daftar pengguna akan otomatis terunduh.</span></div>
+      <button class="btn-auth-sec" onclick="showPanel('panel-pilih')">← Kembali</button>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+// ══════════════════════════════════════
+// CONSTANTS — must be at top
+// ══════════════════════════════════════
+const DB_KEY = 'mw_db_v1';
+const AUTH_KEY = 'mw_auth_v1';
+const AUTH_SESSION = 'mw_sess_v1';
+const AUTH_LASTPAGE = 'mw_page_v1';
+
+// ══════════════════════════════════════
+// DEFAULT DATA
+// ══════════════════════════════════════
+const DEFAULT_DB = {
+  setting:{ pria:'', wanita:'', tglNikah:'', lokasi:'', totalBudget:100000000 },
+  budget:[
+    {id:'B001',nama:'Sewa Gedung',kat:'Gedung & Venue',budget:25000000,realisasi:0,status:'Belum Bayar',vendor:'',catatan:''},
+    {id:'B002',nama:'Catering & Prasmanan',kat:'Catering',budget:30000000,realisasi:15000000,status:'DP',vendor:'RM Sari Rasa',catatan:'500 porsi'},
+    {id:'B003',nama:'Dekorasi & Bunga',kat:'Dekorasi',budget:8000000,realisasi:0,status:'Belum Bayar',vendor:'',catatan:''},
+    {id:'B004',nama:'Fotografer & Videografer',kat:'Fotografer',budget:6000000,realisasi:6000000,status:'Lunas',vendor:'Studio Abadi',catatan:'Include prewedding'},
+    {id:'B005',nama:'Makeup Pengantin',kat:'Makeup & Busana',budget:4000000,realisasi:2000000,status:'DP',vendor:'MUA Cantik',catatan:''},
+    {id:'B006',nama:'Baju Pengantin (Sewa)',kat:'Makeup & Busana',budget:5000000,realisasi:0,status:'Belum Bayar',vendor:'',catatan:''},
+    {id:'B007',nama:'Undangan & Souvenir',kat:'Undangan',budget:3000000,realisasi:1500000,status:'DP',vendor:'Percetakan Maju',catatan:'200 undangan'},
+    {id:'B008',nama:'MC & Hiburan',kat:'MC & Hiburan',budget:4000000,realisasi:0,status:'Belum Bayar',vendor:'',catatan:''},
+    {id:'B009',nama:'Transportasi',kat:'Transportasi',budget:2000000,realisasi:0,status:'Belum Bayar',vendor:'',catatan:''},
+    {id:'B010',nama:'Cincin Pernikahan',kat:'Lain-lain',budget:5000000,realisasi:5000000,status:'Lunas',vendor:'Toko Emas Indah',catatan:'2 pcs'},
+  ],
+  dokumen:[
+    {id:'D001',nama:'KTP Mempelai Pria',jenis:'Identitas',untuk:'Pria',status:'Selesai',prioritas:'Wajib',deadline:'2026-05-01',catatan:''},
+    {id:'D002',nama:'KTP Mempelai Wanita',jenis:'Identitas',untuk:'Wanita',status:'Selesai',prioritas:'Wajib',deadline:'2026-05-01',catatan:''},
+    {id:'D003',nama:'Surat N1 (Pengantar Nikah)',jenis:'KUA & Sipil',untuk:'Keduanya',status:'Sedang Diurus',prioritas:'Wajib',deadline:'2026-06-01',catatan:'Dari kelurahan masing-masing'},
+    {id:'D004',nama:'Surat N2 (Keterangan Orang Tua)',jenis:'KUA & Sipil',untuk:'Keduanya',status:'Belum Diurus',prioritas:'Wajib',deadline:'2026-06-01',catatan:''},
+    {id:'D005',nama:'Surat N4 (Keterangan Wali)',jenis:'KUA & Sipil',untuk:'Wanita',status:'Belum Diurus',prioritas:'Wajib',deadline:'2026-06-01',catatan:'Dari KUA setempat'},
+    {id:'D006',nama:'Kartu Keluarga',jenis:'Keluarga',untuk:'Keduanya',status:'Selesai',prioritas:'Wajib',deadline:'2026-05-01',catatan:''},
+    {id:'D007',nama:'Pas Foto 2x3 & 3x4',jenis:'Identitas',untuk:'Keduanya',status:'Selesai',prioritas:'Wajib',deadline:'2026-05-15',catatan:'Masing-masing 6 lembar'},
+    {id:'D008',nama:'Surat Keterangan Sehat',jenis:'Kesehatan',untuk:'Keduanya',status:'Belum Diurus',prioritas:'Penting',deadline:'2026-06-15',catatan:'Dari puskesmas/RS'},
+    {id:'D009',nama:'Buku Nikah Kosong',jenis:'KUA & Sipil',untuk:'Keduanya',status:'Belum Diurus',prioritas:'Wajib',deadline:'2026-06-20',catatan:'Dari KUA'},
+    {id:'D010',nama:'Daftar Saksi Nikah (2 orang)',jenis:'KUA & Sipil',untuk:'Keduanya',status:'Belum Diurus',prioritas:'Wajib',deadline:'2026-06-20',catatan:'Siapkan KTP saksi'},
+  ],
+  vendor:[
+    {id:'V001',nama:'Studio Abadi Photography',kat:'Fotografer',harga:6000000,status:'Konfirmasi',kontak:'0812-1111-2222',rating:5,alamat:'Jl. Foto No.1',catatan:'Include 2 kamera, prewedding & wedding'},
+    {id:'V002',nama:'RM Sari Rasa Catering',kat:'Catering',harga:30000000,status:'Konfirmasi',kontak:'0813-3333-4444',rating:4,alamat:'Jl. Masak No.5',catatan:'500 porsi, 30 menu pilihan'},
+    {id:'V003',nama:'Bunga Indah Dekorasi',kat:'Dekorasi',harga:8000000,status:'Disurvei',kontak:'0877-5555-6666',rating:4,alamat:'Jl. Kembang No.3',catatan:'Konsultasi sudah, menunggu deal'},
+    {id:'V004',nama:'MUA Cantik Salon',kat:'Makeup & Busana',harga:4000000,status:'Konfirmasi',kontak:'0821-7777-8888',rating:5,alamat:'Jl. Cantik No.7',catatan:'Include 2 bridesmaid'},
+    {id:'V005',nama:'Gedung Serbaguna Bahagia',kat:'Gedung & Venue',harga:25000000,status:'Kandidat',kontak:'0815-9999-0000',rating:4,alamat:'Jl. Gedung No.10',catatan:'Kapasitas 500 orang, ada AC'},
+  ],
+  tamu:[
+    {id:'TM001',nama:'Pak Budi & Keluarga',kel:'Keluarga Pria',jml:4,konfirm:'Hadir',kontak:'0812-1234-5678',undangan:'Sudah',catatan:''},
+    {id:'TM002',nama:'Bu Sari',kel:'Keluarga Wanita',jml:2,konfirm:'Hadir',kontak:'0813-9876-5432',undangan:'Sudah',catatan:''},
+    {id:'TM003',nama:'Rizky & Pasangan',kel:'Teman Pria',jml:2,konfirm:'Belum Konfirmasi',kontak:'0877-1111-2222',undangan:'Belum',catatan:''},
+    {id:'TM004',nama:'Group Kantor',kel:'Kolega',jml:8,konfirm:'Hadir',kontak:'',undangan:'Sudah',catatan:'Dari divisi marketing'},
+    {id:'TM005',nama:'Pak RT & Warga',kel:'Tetangga',jml:15,konfirm:'Hadir',kontak:'',undangan:'Sudah',catatan:''},
+  ],
+  timeline:[
+    {id:'TL001',nama:'Daftar ke KUA',kat:'Dokumen',deadline:'2026-06-01',prioritas:'Tinggi',status:'Sedang',catatan:'Bawa semua dokumen persyaratan'},
+    {id:'TL002',nama:'Booking Gedung',kat:'Venue & Gedung',deadline:'2026-05-15',prioritas:'Tinggi',status:'Selesai',catatan:''},
+    {id:'TL003',nama:'Fitting Baju Pengantin',kat:'Busana',deadline:'2026-06-10',prioritas:'Tinggi',status:'Belum',catatan:''},
+    {id:'TL004',nama:'Cetak & Kirim Undangan',kat:'Undangan',deadline:'2026-06-20',prioritas:'Tinggi',status:'Belum',catatan:'Target 200 undangan terkirim'},
+    {id:'TL005',nama:'Briefing Fotografer',kat:'Fotografer',deadline:'2026-06-25',prioritas:'Sedang',status:'Belum',catatan:'Diskusi shot list'},
+    {id:'TL006',nama:'Gladi Resik Acara',kat:'Lainnya',deadline:'2026-06-29',prioritas:'Tinggi',status:'Belum',catatan:'H-1 pernikahan'},
+    {id:'TL007',nama:'Prewedding Photoshoot',kat:'Fotografer',deadline:'2026-05-20',prioritas:'Sedang',status:'Selesai',catatan:'Lokasi taman kota'},
+    {id:'TL008',nama:'Pesan Souvenir',kat:'Undangan',deadline:'2026-05-30',prioritas:'Sedang',status:'Belum',catatan:'500 pcs'},
+  ],
+  counters:{bud:11,dok:11,vnd:6,tamu:6,tl:9}
+};
+
+let db = JSON.parse(JSON.stringify(DEFAULT_DB)); // will be overwritten on login
+
+// ══════════════════════════════════════════════════════
+// STORAGE LAYER — localStorage per-user + Sync Code
+// Data disimpan di browser lokal, keyed by email user.
+// Cross-device: gunakan fitur "Sinkronisasi" (Export/Import Kode Sinkron)
+// ══════════════════════════════════════════════════════
+
+function dbKey(email){
+  return 'mw_db_' + (email||'guest').toLowerCase().replace(/[^a-z0-9]/g,'_');
+}
+function authKey(){
+  return 'mw_auth_accounts_v2';
+}
+
+function saveDB(){
+  try{
+    setSyncStatus('saving');
+    const key = currentUser ? dbKey(currentUser.email) : DB_KEY;
+    localStorage.setItem(key, JSON.stringify(db));
+    setSyncStatus('saved');
+  }catch(e){
+    setSyncStatus('error');
+    toast('Gagal menyimpan (storage penuh?)','err');
+    console.error('saveDB error:',e);
+  }
+}
+
+function loadDBForUser(email){
+  try{
+    const key = dbKey(email);
+    const r = localStorage.getItem(key);
+    if(r){ db = JSON.parse(r); }
+    else { db = JSON.parse(JSON.stringify(DEFAULT_DB)); }
+  }catch(e){
+    db = JSON.parse(JSON.stringify(DEFAULT_DB));
+  }
+}
+
+function loadAuthAccounts(){
+  try{
+    const r = localStorage.getItem(authKey());
+    if(r){ authAccounts = JSON.parse(r); return; }
+    // migrate from old key
+    const old = localStorage.getItem(AUTH_KEY);
+    if(old){ authAccounts = JSON.parse(old); return; }
+  }catch(e){}
+  authAccounts = [{id:'USR001',nama:'Admin',email:'admin@wedding.com',pw:'1234',role:'owner',kode:'WEDDING2024',tgl:nowDate(),lastLogin:null}];
+}
+
+function saveAuth(a){
+  authAccounts = a;
+  try{
+    localStorage.setItem(authKey(), JSON.stringify(a));
+  }catch(e){
+    console.error('saveAuth error:',e);
+  }
+}
+
+function setSyncStatus(state){
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-txt');
+  if(!dot||!txt) return;
+  const states = {
+    saving: ['#f59e0b','Menyimpan...'],
+    saved:  ['#10b981','Tersimpan ✓'],
+    error:  ['#ef4444','Gagal simpan'],
+    cloud:  ['#3b82f6','Tersinkron ☁️'],
+  };
+  const [color, label] = states[state] || states.saved;
+  dot.style.background = color;
+  txt.textContent = label;
+}
+
+// ── SYNC CODE: encode & decode data untuk transfer antar device ──
+function buatKodeSinkron(){
+  if(!currentUser){ toast('Login dulu!','err'); return; }
+  try{
+    const payload = {
+      v: 1,
+      email: currentUser.email,
+      nama: currentUser.nama,
+      ts: Date.now(),
+      db: db,
+    };
+    const json = JSON.stringify(payload);
+    const encoded = btoa(unescape(encodeURIComponent(json)));
+    // Split into chunks for readability & copy
+    const kode = encoded;
+    document.getElementById('sync-code-output').value = kode;
+    
+    document.getElementById('sync-import-section').style.display = 'none';
+    openModal('modal-sinkron');
+    toast('Kode sinkron berhasil dibuat!');
+  }catch(e){
+    toast('Gagal membuat kode sinkron','err');
+    console.error(e);
+  }
+}
+
+function importKodeSinkron(){
+  const kode = (document.getElementById('sync-code-input').value||'').trim();
+  if(!kode){ toast('Masukkan kode sinkron!','err'); return; }
+  try{
+    const json = decodeURIComponent(escape(atob(kode)));
+    const payload = JSON.parse(json);
+    if(!payload.db || !payload.email){ toast('Kode tidak valid!','err'); return; }
+    if(currentUser && payload.email.toLowerCase() !== currentUser.email.toLowerCase()){
+      if(!confirm(`Data ini milik akun ${payload.email}. Import ke akun Anda (${currentUser.email})?`)) return;
+    }
+    db = payload.db;
+    saveDB();
+    closeModal('modal-sinkron');
+    renderDashboard();
+    toast('Data berhasil diimport dari kode sinkron! ✓');
+  }catch(e){
+    toast('Kode sinkron tidak valid atau rusak!','err');
+    console.error(e);
+  }
+}
+
+function salinKodeSinkron(){
+  const el = document.getElementById('sync-code-output');
+  if(!el) return;
+  el.select();
+  document.execCommand('copy');
+  toast('Kode sinkron disalin!');
+}
+
+
+// [old async storage removed]
+_lupaEmail=''; // reuse global
+
+function showPanel(id){
+  document.querySelectorAll('.auth-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  ['login-err','lupa-err','lupa-ok','daftar-err'].forEach(xid=>{
+    const el=document.getElementById(xid);if(el)el.classList.remove('show');
+    const tx=document.getElementById(xid+'-txt');if(tx)tx.textContent='';
+  });
+  if(id==='panel-pilih')renderAuthList();
+  if(id==='panel-lupa'){document.getElementById('lupa-step1').style.display='block';document.getElementById('lupa-step2').style.display='none';}
+}
+function showAuthErr(bid,msg){const el=document.getElementById(bid);el.classList.add('show');const tx=document.getElementById(bid+'-txt');if(tx)tx.textContent=msg;}
+function showAuthOk(bid,msg){const el=document.getElementById(bid);el.classList.add('show');const tx=document.getElementById(bid+'-txt');if(tx)tx.textContent=msg;}
+
+function renderAuthList(){
+  const list=document.getElementById('auth-akun-list');
+  if(!authAccounts.length){list.innerHTML=`<div style="text-align:center;color:var(--text3);padding:1.5rem">Belum ada akun</div>`;return;}
+  const rb={owner:'badge-owner',admin:'badge-admin',user:'badge-user'};
+  list.innerHTML=authAccounts.map((a,i)=>`
+    <div class="acc-item" onclick="quickLogin(${i})">
+      <div class="acc-av">${a.nama.slice(0,2).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700">${a.nama} <span class="badge-role ${rb[a.role]||'badge-user'}">${a.role}</span></div>
+        <div style="font-size:11px;color:var(--text3)">${a.email}</div>
+        ${a.lastLogin?`<div style="font-size:10px;color:var(--text3)">Login: ${a.lastLogin}</div>`:''}
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </div>`).join('');
+}
+function quickLogin(i){const a=authAccounts[i];document.getElementById('login-email').value=a.email;document.getElementById('login-pw').value='';showPanel('panel-login');setTimeout(()=>document.getElementById('login-pw').focus(),150);}
+
+function togglePwVis(inputId,iconId){
+  const inp=document.getElementById(inputId),ico=document.getElementById(iconId);
+  const h=inp.type==='password';inp.type=h?'text':'password';
+  ico.innerHTML=h?`<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`:`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+}
+function checkStrength(inputId,barId){
+  const val=document.getElementById(inputId).value;
+  const segs=document.getElementById(barId).querySelectorAll('.strength-seg');
+  segs.forEach(s=>s.className='strength-seg');
+  if(!val)return;
+  const strong=val.length>=8&&/[A-Z]/.test(val)&&/[0-9]/.test(val);
+  const medium=val.length>=6||/[0-9]/.test(val);
+  if(strong)segs.forEach(s=>s.classList.add('strong'));
+  else if(medium){segs[0].classList.add('medium');segs[1].classList.add('medium');}
+  else segs[0].classList.add('weak');
+}
+function isValidEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+
+function doLogin(){
+  const email = (document.getElementById('login-email').value||'').trim().toLowerCase();
+  const pw = document.getElementById('login-pw').value;
+  if(!email){ showAuthErr('login-err','Email wajib diisi.'); return; }
+  if(!isValidEmail(email)){ showAuthErr('login-err','Format email tidak valid.'); return; }
+  if(!pw){ showAuthErr('login-err','Password wajib diisi.'); return; }
+  const acc = authAccounts.find(a=>a.email.toLowerCase()===email && a.pw===pw);
+  if(!acc){ showAuthErr('login-err','Email atau password tidak cocok.'); return; }
+  acc.lastLogin = nowStr();
+  saveAuth(authAccounts);
+  currentUser = acc;
+  masukAplikasi();
+}
+
+
+function masukAplikasi(){
+  // Load user data from localStorage (per-user key)
+  loadDBForUser(currentUser.email);
+
+  // Save session
+  sessionStorage.setItem(AUTH_SESSION, JSON.stringify({
+    email: currentUser.email,
+    nama: currentUser.nama,
+    ts: Date.now()
+  }));
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'grid';
+  updateSidebarUser();
+  setSyncStatus('saved');
+  renderDashboard();
+
+  const lp = sessionStorage.getItem(AUTH_LASTPAGE);
+  if(lp && lp !== 'dashboard'){
+    const btn = document.querySelector(`[data-page="${lp}"]`);
+    if(btn) goPage(lp, btn);
+  }
+  toast(`Selamat datang, ${currentUser.nama}! 👋`);
+}
+
+
+function doLogout(){
+  if(!confirm('Keluar dari aplikasi?'))return;
+  sessionStorage.removeItem(AUTH_SESSION);sessionStorage.removeItem(AUTH_LASTPAGE);
+  currentUser=null;
+  document.getElementById('app-shell').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  showPanel('panel-pilih');renderAuthList();
+  toast('Berhasil logout.','info');
+}
+function verifikasiPemulihan(){
+  const email=(document.getElementById('lupa-email').value||'').trim().toLowerCase();
+  const kode=(document.getElementById('lupa-kode').value||'').trim().toUpperCase();
+  if(!email||!kode){showAuthErr('lupa-err','Isi semua field.');return;}
+  const acc=authAccounts.find(a=>a.email.toLowerCase()===email&&a.kode===kode);
+  if(!acc){showAuthErr('lupa-err','Email atau kode pemulihan tidak cocok.');return;}
+  _lupaEmail=email;
+  document.getElementById('lupa-err').classList.remove('show');
+  showAuthOk('lupa-ok',`Verifikasi berhasil! Halo ${acc.nama}.`);
+  document.getElementById('lupa-step1').style.display='none';
+  document.getElementById('lupa-step2').style.display='block';
+}
+async function resetPassword(){
+  const nb=document.getElementById('lupa-pw-baru').value;
+  const nk=document.getElementById('lupa-pw-konfirm').value;
+  if(nb.length<6){showAuthErr('lupa-err','Min. 6 karakter.');return;}
+  if(nb!==nk){showAuthErr('lupa-err','Konfirmasi tidak cocok.');return;}
+  const idx=authAccounts.findIndex(a=>a.email.toLowerCase()===_lupaEmail);
+  if(idx>=0){authAccounts[idx].pw=nb;await saveAuth(authAccounts);}
+  ['lupa-pw-baru','lupa-pw-konfirm'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('lupa-ok').classList.remove('show');
+  document.getElementById('lupa-step1').style.display='block';
+  document.getElementById('lupa-step2').style.display='none';
+  showPanel('panel-login');toast('Password direset!');
+}
+async function buatAkun(){
+  const nama=(document.getElementById('daftar-nama').value||'').trim();
+  const email=(document.getElementById('daftar-email').value||'').trim().toLowerCase();
+  const role=document.getElementById('daftar-role').value;
+  const pw=document.getElementById('daftar-pw').value;
+  const konfirm=document.getElementById('daftar-konfirm').value;
+  const kode=(document.getElementById('daftar-kode').value||'').trim().toUpperCase();
+  if(!nama){showAuthErr('daftar-err','Nama wajib diisi.');return;}
+  if(!isValidEmail(email)){showAuthErr('daftar-err','Email tidak valid.');return;}
+  if(pw.length<6){showAuthErr('daftar-err','Password min. 6 karakter.');return;}
+  if(pw!==konfirm){showAuthErr('daftar-err','Konfirmasi tidak cocok.');return;}
+  if(!kode||kode.length<6){showAuthErr('daftar-err','Kode pemulihan min. 6 karakter.');return;}
+  if(authAccounts.find(a=>a.email.toLowerCase()===email)){showAuthErr('daftar-err','Email sudah terdaftar.');return;}
+  const newAcc={id:'USR'+String(authAccounts.length+1).padStart(3,'0'),nama,email,pw,role,kode,tgl:nowDate(),lastLogin:null};
+  authAccounts.push(newAcc);await saveAuth(authAccounts);
+  // Ekspor XLSX users
+  try{
+    const wb=XLSX.utils.book_new();
+    const rows=[['maNTapps Wedding — Database Pengguna','','','','',''],['Diekspor: '+nowStr(),'','','','',''],[''],['ID','Nama','Email','Role','Tanggal Daftar','Kode Pemulihan'],...authAccounts.map(a=>[a.id,a.nama,a.email,a.role.toUpperCase(),a.tgl,a.kode])];
+    const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:10},{wch:22},{wch:32},{wch:10},{wch:16},{wch:20}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:5}},{s:{r:1,c:0},e:{r:1,c:5}}];
+    XLSX.utils.book_append_sheet(wb,ws,'Users');XLSX.writeFile(wb,`maNTapps_Wedding_Users_${nowDate()}.xlsx`);
+  }catch(e){toast('Ekspor XLSX gagal.','err');}
+  ['daftar-nama','daftar-email','daftar-pw','daftar-konfirm','daftar-kode'].forEach(x=>document.getElementById(x).value='');
+  checkStrength('daftar-pw','daftar-str');
+  showPanel('panel-pilih');toast(`Akun "${nama}" dibuat!`);
+}
+async function gantiPassword(){
+  const lama=document.getElementById('gpw-lama').value;
+  const baru=document.getElementById('gpw-baru').value;
+  const konfirm=document.getElementById('gpw-konfirm').value;
+  const errEl=document.getElementById('gpw-err');errEl.style.display='none';
+  if(!currentUser)return;
+  const acc=authAccounts.find(a=>a.email===currentUser.email);
+  if(!acc||acc.pw!==lama){errEl.textContent='Password lama tidak cocok.';errEl.style.display='flex';return;}
+  if(baru.length<6){errEl.textContent='Min. 6 karakter.';errEl.style.display='flex';return;}
+  if(baru!==konfirm){errEl.textContent='Konfirmasi tidak cocok.';errEl.style.display='flex';return;}
+  acc.pw=baru;await saveAuth(authAccounts);
+  closeModal('modal-ganti-pw');['gpw-lama','gpw-baru','gpw-konfirm'].forEach(id=>document.getElementById(id).value='');
+  toast('Password berhasil diubah!');
+}
+
+// ── CLOCK & STARTUP ──
+function tickDate(){
+  const el=document.getElementById('tb-date');
+  if(el) el.textContent=new Date().toLocaleString('id-ID',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
+
+window.addEventListener('load', ()=>{
+  tickDate(); setInterval(tickDate, 60000);
+
+  // Load auth accounts from localStorage
+  loadAuthAccounts();
+
+  // Keyboard shortcuts
+  const lpw = document.getElementById('login-pw');
+  if(lpw) lpw.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  const le = document.getElementById('login-email');
+  if(le) le.addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('login-pw').focus(); });
+
+  // Restore session
+  const raw = sessionStorage.getItem(AUTH_SESSION);
+  if(raw){
+    try{
+      const sess = JSON.parse(raw);
+      if(sess && sess.email && (Date.now() - sess.ts) < 86400000){
+        const acc = authAccounts.find(a=>a.email.toLowerCase()===sess.email.toLowerCase());
+        if(acc){
+          currentUser = acc;
+          loadDBForUser(acc.email);
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app-shell').style.display = 'grid';
+          updateSidebarUser();
+          setSyncStatus('saved');
+          renderDashboard();
+          const lp = sessionStorage.getItem(AUTH_LASTPAGE);
+          if(lp && lp!=='dashboard'){
+            const btn = document.querySelector(`[data-page="${lp}"]`);
+            if(btn) goPage(lp, btn);
+          }
+          return;
+        }
+      }
+    }catch(e){ sessionStorage.removeItem(AUTH_SESSION); }
+  }
+
+  renderAuthList();
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+function switchSyncTab(tab){
+  const exportSec = document.getElementById('sync-code-section');
+  const importSec = document.getElementById('sync-import-section');
+  const tabExp = document.getElementById('tab-export');
+  const tabImp = document.getElementById('tab-import');
+  if(exportSec) exportSec.style.display = tab==='export'?'block':'none';
+  if(importSec) importSec.style.display = tab==='import'?'block':'none';
+  if(tabExp) tabExp.classList.toggle('active', tab==='export');
+  if(tabImp) tabImp.classList.toggle('active', tab==='import');
+  if(tab==='export') buatKodeSinkron();
+  else { const inp=document.getElementById('sync-code-input'); if(inp) inp.value=''; }
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION & CORE
+// ══════════════════════════════════════════════════════
+const PAGE_TITLES={
+  dashboard:'Dashboard <span>Pernikahan</span>',
+  budget:'Budget <span>& Pengeluaran</span>',
+  dokumen:'Dokumen <span>& KUA</span>',
+  vendor:'Vendor <span>& Jasa</span>',
+  tamu:'Daftar <span>Tamu</span>',
+  timeline:'Timeline <span>& Checklist</span>',
+  laporan:'Laporan <span>Keuangan</span>',
+  pengaturan:'<span>Pengaturan</span>',
+};
+const ADD_MODALS={budget:'modal-budget',dokumen:'modal-dokumen',vendor:'modal-vendor',tamu:'modal-tamu',timeline:'modal-timeline'};
+const ADD_LABELS={budget:'+ Item Budget',dokumen:'+ Dokumen',vendor:'+ Vendor',tamu:'+ Tamu',timeline:'+ Tugas'};
+
+function goPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  else document.querySelector('[data-page="'+name+'"]')?.classList.add('active');
+  document.getElementById('tb-title').innerHTML=PAGE_TITLES[name]||name;
+  const addBtn=document.getElementById('btn-add-main');
+  if(ADD_LABELS[name]){addBtn.style.display='flex';addBtn.textContent=ADD_LABELS[name];}
+  else addBtn.style.display='none';
+  sessionStorage.setItem(AUTH_LASTPAGE,name);
+  const renders={dashboard:renderDashboard,budget:renderBudget,dokumen:renderDokumen,vendor:renderVendor,tamu:renderTamu,timeline:renderTimeline,laporan:renderLaporan,pengaturan:renderPengaturan};
+  if(renders[name]) renders[name]();
+}
+function openAddMain(){const pg=sessionStorage.getItem(AUTH_LASTPAGE)||'dashboard';if(ADD_MODALS[pg])openModal(ADD_MODALS[pg]);}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+
+function fmt(n){return 'Rp '+Math.round(n||0).toLocaleString('id-ID');}
+function fmtS(n){if(n>=1e9)return'Rp '+(n/1e9).toFixed(1)+'M';if(n>=1e6)return'Rp '+(n/1e6).toFixed(1)+' jt';return fmt(n);}
+function nowDate(){return new Date().toISOString().slice(0,10);}
+function nowStr(){return new Date().toLocaleString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function daysLeft(d){return Math.ceil((new Date(d)-new Date())/86400000);}
+function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
+function toast(msg,type='ok'){const c=document.getElementById('toast-wrap');const el=document.createElement('div');el.className='toast '+type;el.innerHTML='<div class="toast-dot"></div><span>'+msg+'</span>';c.appendChild(el);setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),300);},2800);}
+function updateSidebarUser(){if(!currentUser)return;document.getElementById('sb-name').textContent=currentUser.nama;document.getElementById('sb-av').textContent=currentUser.nama.slice(0,1).toUpperCase();document.getElementById('sb-role').textContent=currentUser.role;const s=db.setting;const coupleText=s.pria&&s.wanita?'✦ '+s.pria+' & '+s.wanita+' ✦':'✦ Nama & Pasangan ✦';document.getElementById('sb-couple').textContent=coupleText;}
+
+// ══════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════
+function renderDashboard(){
+  const s=db.setting;
+  const coupleText=s.pria&&s.wanita?'✦ '+s.pria+' & '+s.wanita+' ✦':'✦ Nama & Pasangan ✦';
+  document.getElementById('sb-couple').textContent=coupleText;
+  document.getElementById('dash-couple-banner').textContent=coupleText;
+  if(s.tglNikah){const dl=daysLeft(s.tglNikah);document.getElementById('dash-countdown').textContent=dl>0?dl:'Hari ini! 🎊';document.getElementById('dash-wedding-date').textContent=new Date(s.tglNikah).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
+  const totalBudget=db.budget.reduce((a,b)=>a+b.budget,0);
+  const totalReal=db.budget.reduce((a,b)=>a+b.realisasi,0);
+  const totalTamu=db.tamu.reduce((a,t)=>a+t.jml,0);
+  const tamuHadir=db.tamu.filter(t=>t.konfirm==='Hadir').reduce((a,t)=>a+t.jml,0);
+  const dokSelesai=db.dokumen.filter(d=>d.status==='Selesai').length;
+  const taskDone=db.timeline.filter(t=>t.status==='Selesai').length;
+  document.getElementById('dash-stats').innerHTML=
+    '<div class="stat-card blue"><div class="stat-label">Total Budget</div><div class="stat-val blue">'+fmtS(totalBudget)+'</div><div class="stat-sub">dari '+fmtS(s.totalBudget||totalBudget)+'</div></div>'+
+    '<div class="stat-card rose"><div class="stat-label">Sudah Dibayar</div><div class="stat-val rose">'+fmtS(totalReal)+'</div><div class="stat-sub">'+Math.round(totalReal/Math.max(totalBudget,1)*100)+'% dari budget</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Sisa Budget</div><div class="stat-val '+(totalBudget-totalReal>=0?'green':'red')+'">'+fmtS(totalBudget-totalReal)+'</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Tamu Undangan</div><div class="stat-val">'+totalTamu+'</div><div class="stat-sub"><span class="delta up">'+tamuHadir+' konfirmasi</span></div></div>'+
+    '<div class="stat-card"><div class="stat-label">Dokumen Selesai</div><div class="stat-val green">'+dokSelesai+'/'+db.dokumen.length+'</div><div class="stat-sub">Tugas: '+taskDone+'/'+db.timeline.length+'</div></div>';
+  const katMap={};
+  db.budget.forEach(b=>{if(!katMap[b.kat])katMap[b.kat]=0;katMap[b.kat]+=b.budget;});
+  const katArr=Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const maxK=katArr[0]?katArr[0][1]:1;
+  const barColors=['#2563eb','#0ea5e9','#3b82f6','#60a5fa','#7c3aed','#f43f5e','#d97706'];
+  document.getElementById('dash-budget-chart').innerHTML=katArr.map(([k,v],i)=>'<div class="bar-row"><div class="bar-lbl">'+k+'</div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(v/maxK*100)+'%;background:'+barColors[i%barColors.length]+'"><span>'+fmtS(v)+'</span></div></div></div>').join('');
+  const upcoming=db.timeline.filter(t=>t.status!=='Selesai').sort((a,b)=>a.deadline.localeCompare(b.deadline)).slice(0,5);
+  document.getElementById('dash-checklist').innerHTML=upcoming.length?upcoming.map(t=>{const dl=daysLeft(t.deadline);const late=dl<0;return '<div class="check-item" onclick="toggleTimeline(\''+t.id+'\')"><div class="check-box"></div><div style="flex:1"><div class="check-name">'+t.nama+'</div><div class="check-meta">'+t.kat+' · '+(late?'<span style="color:var(--red)">Terlambat '+Math.abs(dl)+' hari</span>':dl+'H lagi')+'</div></div><span class="badge '+(t.prioritas==='Tinggi'?'b-penting':t.prioritas==='Sedang'?'b-proses':'b-pending')+'">'+t.prioritas+'</span></div>';}).join(''):'<div style="text-align:center;color:var(--text3);padding:1.5rem">Semua tugas selesai! 🎉</div>';
+  const dokPending=db.dokumen.filter(d=>d.status!=='Selesai').slice(0,5);
+  document.getElementById('dash-dokumen').innerHTML=dokPending.length?dokPending.map(d=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:12.5px;font-weight:600">'+d.nama+'</div><div style="font-size:11px;color:var(--text3)">'+d.untuk+' · '+d.deadline+'</div></div><span class="badge '+(d.status==='Selesai'?'b-done':d.status==='Sedang Diurus'?'b-proses':'b-pending')+'">'+d.status+'</span></div>').join(''):'<div style="text-align:center;color:var(--green);padding:1.5rem">✓ Semua dokumen selesai!</div>';
+  const vKonfirm=db.vendor.filter(v=>v.status==='Konfirmasi');
+  document.getElementById('dash-vendor').innerHTML=vKonfirm.length?vKonfirm.map(v=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="flex:1"><div style="font-size:12.5px;font-weight:600">'+v.nama+'</div><div style="font-size:11px;color:var(--text3)">'+v.kat+'</div></div><div style="font-size:12px;font-weight:700;color:var(--blue)">'+fmtS(v.harga)+'</div></div>').join(''):'<div style="text-align:center;color:var(--text3);padding:1.5rem">Belum ada vendor terkonfirmasi</div>';
+}
+
+// ══════════════════════════════════════════════════════
+// BUDGET
+// ══════════════════════════════════════════════════════
+let _editId={};
+function renderBudget(){
+  const q=(document.getElementById('bud-srch').value||'').toLowerCase();
+  const kat=document.getElementById('bud-kat').value;
+  const status=document.getElementById('bud-status').value;
+  const katSel=document.getElementById('bud-kat');
+  if(katSel.options.length<=1){const kats=[...new Set(db.budget.map(b=>b.kat))].sort();kats.forEach(k=>{const o=document.createElement('option');o.textContent=o.value=k;katSel.appendChild(o);});document.getElementById('bf-kat').innerHTML=['Gedung & Venue','Catering','Dekorasi','Fotografer','Makeup & Busana','MC & Hiburan','Undangan','Transportasi','Dokumentasi','Lain-lain'].map(k=>'<option>'+k+'</option>').join('');}
+  let d=db.budget.filter(b=>(!q||b.nama.toLowerCase().includes(q)||b.kat.toLowerCase().includes(q))&&(!kat||b.kat===kat)&&(!status||b.status===status));
+  const tB=d.reduce((s,b)=>s+b.budget,0),tR=d.reduce((s,b)=>s+b.realisasi,0),tL=d.filter(b=>b.status==='Lunas').length;
+  document.getElementById('bud-stats').innerHTML='<div class="stat-card"><div class="stat-label">Total Item</div><div class="stat-val">'+d.length+'</div></div><div class="stat-card blue"><div class="stat-label">Total Budget</div><div class="stat-val blue">'+fmtS(tB)+'</div></div><div class="stat-card rose"><div class="stat-label">Total Dibayar</div><div class="stat-val rose">'+fmtS(tR)+'</div><div class="stat-sub">'+Math.round(tR/Math.max(tB,1)*100)+'%</div></div><div class="stat-card"><div class="stat-label">Sisa</div><div class="stat-val '+(tB-tR>=0?'green':'red')+'">'+fmtS(tB-tR)+'</div></div><div class="stat-card"><div class="stat-label">Lunas</div><div class="stat-val green">'+tL+'/'+d.length+'</div></div>';
+  const bc={Lunas:'b-lunas',DP:'b-dp','Belum Bayar':'b-belum'};
+  document.getElementById('bud-tbody').innerHTML=d.length?d.map(b=>{const sel=b.budget-b.realisasi;return '<tr><td><div style="font-weight:700">'+b.nama+'</div>'+(b.catatan?'<div style="font-size:11px;color:var(--text3)">'+b.catatan+'</div>':'')+'</td><td style="color:var(--text2)">'+b.kat+'</td><td style="font-weight:700;color:var(--blue)">'+fmt(b.budget)+'</td><td style="font-weight:700;color:var(--rose)">'+fmt(b.realisasi)+'</td><td style="font-weight:700;color:'+(sel>=0?'var(--green)':'var(--red)')+'">'+fmt(sel)+'</td><td><span class="badge '+(bc[b.status]||'b-pending')+'">'+b.status+'</span></td><td style="color:var(--text2)">'+(b.vendor||'—')+'</td><td><div style="display:flex;gap:5px"><button class="tb-btn" style="height:26px;font-size:10.5px;padding:0 8px" onclick="editBudget(\''+b.id+'\')">Edit</button><button class="tb-btn" style="height:26px;font-size:10.5px;padding:0 8px;color:var(--red)" onclick="hapusBudget(\''+b.id+'\')">Hapus</button></div></td></tr>';}).join(''):'<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Tidak ada data</td></tr>';
+}
+function editBudget(id){const b=db.budget.find(x=>x.id===id);if(!b)return;_editId.budget=id;document.getElementById('modal-budget-title').textContent='Edit Item Budget';document.getElementById('bf-nama').value=b.nama;document.getElementById('bf-kat').value=b.kat;document.getElementById('bf-budget').value=b.budget;document.getElementById('bf-realisasi').value=b.realisasi;document.getElementById('bf-status').value=b.status;document.getElementById('bf-vendor').value=b.vendor;document.getElementById('bf-catatan').value=b.catatan;openModal('modal-budget');}
+function saveBudget(){
+  const nama=document.getElementById('bf-nama').value.trim();
+  if(!nama){toast('Nama item wajib!','err');return;}
+  const data={nama,kat:document.getElementById('bf-kat').value,budget:parseFloat(document.getElementById('bf-budget').value)||0,realisasi:parseFloat(document.getElementById('bf-realisasi').value)||0,status:document.getElementById('bf-status').value,vendor:document.getElementById('bf-vendor').value,catatan:document.getElementById('bf-catatan').value};
+  if(_editId.budget){const idx=db.budget.findIndex(x=>x.id===_editId.budget);if(idx>=0)db.budget[idx]={...db.budget[idx],...data};}else db.budget.push({id:nextId('bud','B'),...data});
+  _editId.budget=null;saveDB();closeModal('modal-budget');renderBudget();toast('Budget disimpan!');
+}
+function hapusBudget(id){if(!confirm('Hapus?'))return;db.budget=db.budget.filter(x=>x.id!==id);saveDB();renderBudget();toast('Dihapus.','info');}
+
+// ══════════════════════════════════════════════════════
+// DOKUMEN
+// ══════════════════════════════════════════════════════
+function renderDokumen(){
+  const filter=document.getElementById('dok-filter').value;
+  let d=db.dokumen;
+  if(filter==='Belum')d=d.filter(x=>x.status!=='Selesai');
+  if(filter==='Selesai')d=d.filter(x=>x.status==='Selesai');
+  const selesai=db.dokumen.filter(x=>x.status==='Selesai').length,sedang=db.dokumen.filter(x=>x.status==='Sedang Diurus').length;
+  document.getElementById('dok-stats').innerHTML='<div class="stat-card green"><div class="stat-label">Selesai</div><div class="stat-val green">'+selesai+'/'+db.dokumen.length+'</div></div><div class="stat-card blue"><div class="stat-label">Sedang Diurus</div><div class="stat-val blue">'+sedang+'</div></div><div class="stat-card rose"><div class="stat-label">Belum Diurus</div><div class="stat-val rose">'+(db.dokumen.length-selesai-sedang)+'</div></div>';
+  const byJenis={};d.forEach(doc=>{if(!byJenis[doc.jenis])byJenis[doc.jenis]=[];byJenis[doc.jenis].push(doc);});
+  const pBg={'Wajib':'#fee2e2','Penting':'#fef3c7','Opsional':'#f0f9ff'},pClr={'Wajib':'var(--red)','Penting':'var(--amber)','Opsional':'var(--blue)'};
+  document.getElementById('dok-list').innerHTML=Object.entries(byJenis).map(([jenis,docs])=>'<div class="card"><div class="card-hdr"><span class="card-title">'+jenis+'</span><span style="font-size:11px;color:var(--text3)">'+docs.filter(d=>d.status==='Selesai').length+'/'+docs.length+' selesai</span></div>'+docs.map(doc=>{const dl=doc.deadline?daysLeft(doc.deadline):999;return '<div class="check-item '+(doc.status==='Selesai'?'done':'')+'" onclick="toggleDokumen(\''+doc.id+'\')"><div class="check-box">'+(doc.status==='Selesai'?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div><div style="flex:1"><div class="check-name">'+doc.nama+'</div><div class="check-meta">Untuk: '+doc.untuk+(doc.deadline?' · '+doc.deadline+(dl<7&&doc.status!=='Selesai'?' <span style="color:var(--red)">('+( dl>=0?dl+'H':'Terlambat!')+')':'</span>'):'')+' </div>'+(doc.catatan?'<div style="font-size:11px;color:var(--text3)">'+doc.catatan+'</div>':'')+'</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:'+pBg[doc.prioritas]+';color:'+pClr[doc.prioritas]+'">'+doc.prioritas+'</span><div style="display:flex;gap:4px"><button onclick="event.stopPropagation();editDokumen(\''+doc.id+'\')" class="tb-btn" style="height:22px;font-size:10px;padding:0 7px">Edit</button><button onclick="event.stopPropagation();hapusDokumen(\''+doc.id+'\')" class="tb-btn" style="height:22px;font-size:10px;padding:0 7px;color:var(--red)">Hapus</button></div></div></div>';}).join('')+'</div>').join('');
+  document.getElementById('badge-dokumen').textContent=db.dokumen.length-selesai;
+}
+function toggleDokumen(id){const d=db.dokumen.find(x=>x.id===id);if(!d)return;d.status=d.status==='Selesai'?'Belum Diurus':'Selesai';saveDB();renderDokumen();toast(d.status==='Selesai'?'Selesai! ✓':'Ditandai belum.','info');}
+function editDokumen(id){const d=db.dokumen.find(x=>x.id===id);if(!d)return;_editId.dokumen=id;document.getElementById('df-nama').value=d.nama;document.getElementById('df-jenis').value=d.jenis;document.getElementById('df-untuk').value=d.untuk;document.getElementById('df-deadline').value=d.deadline||'';document.getElementById('df-status').value=d.status;document.getElementById('df-prioritas').value=d.prioritas;document.getElementById('df-catatan').value=d.catatan||'';openModal('modal-dokumen');}
+function saveDokumen(){const nama=document.getElementById('df-nama').value.trim();if(!nama){toast('Nama wajib!','err');return;}const data={nama,jenis:document.getElementById('df-jenis').value,untuk:document.getElementById('df-untuk').value,deadline:document.getElementById('df-deadline').value,status:document.getElementById('df-status').value,prioritas:document.getElementById('df-prioritas').value,catatan:document.getElementById('df-catatan').value};if(_editId.dokumen){const idx=db.dokumen.findIndex(x=>x.id===_editId.dokumen);if(idx>=0)db.dokumen[idx]={...db.dokumen[idx],...data};}else db.dokumen.push({id:nextId('dok','D'),...data});_editId.dokumen=null;saveDB();closeModal('modal-dokumen');renderDokumen();toast('Dokumen disimpan!');}
+function hapusDokumen(id){if(!confirm('Hapus?'))return;db.dokumen=db.dokumen.filter(x=>x.id!==id);saveDB();renderDokumen();}
+
+// ══════════════════════════════════════════════════════
+// VENDOR
+// ══════════════════════════════════════════════════════
+const VENDOR_EMOJI={'Gedung & Venue':'🏛️','Catering':'🍽️','Dekorasi':'💐','Fotografer':'📷','Videografer':'🎬','Makeup & Busana':'💄','MC & Hiburan':'🎤','Undangan':'💌','Transportasi':'🚗','Dokumentasi':'📸','Katering Prasmanan':'🥘','Lainnya':'✨'};
+function renderVendor(){
+  const q=(document.getElementById('vnd-srch').value||'').toLowerCase(),kat=document.getElementById('vnd-kat').value,status=document.getElementById('vnd-status').value;
+  const katSel=document.getElementById('vnd-kat');
+  if(katSel.options.length<=1){const kats=[...new Set(db.vendor.map(v=>v.kat))].sort();kats.forEach(k=>{const o=document.createElement('option');o.textContent=o.value=k;katSel.appendChild(o);});}
+  let d=db.vendor.filter(v=>(!q||v.nama.toLowerCase().includes(q)||v.kat.toLowerCase().includes(q))&&(!kat||v.kat===kat)&&(!status||v.status===status));
+  const kf=db.vendor.filter(v=>v.status==='Konfirmasi').length,tb=db.vendor.filter(v=>v.status==='Konfirmasi').reduce((s,v)=>s+v.harga,0);
+  document.getElementById('vnd-stats').innerHTML='<div class="stat-card"><div class="stat-label">Total Vendor</div><div class="stat-val">'+db.vendor.length+'</div></div><div class="stat-card green"><div class="stat-label">Terkonfirmasi</div><div class="stat-val green">'+kf+'</div></div><div class="stat-card"><div class="stat-label">Disurvei</div><div class="stat-val blue">'+db.vendor.filter(v=>v.status==='Disurvei').length+'</div></div><div class="stat-card blue"><div class="stat-label">Budget Vendor</div><div class="stat-val blue">'+fmtS(tb)+'</div></div>';
+  const sClr={Konfirmasi:'b-done',Disurvei:'b-proses',Kandidat:'b-pending',Batal:'b-cancel'};
+  document.getElementById('vnd-list').innerHTML=d.length?d.map(v=>'<div class="vendor-card"><div style="display:flex;align-items:flex-start;gap:12px"><div class="vendor-cat-icon" style="background:var(--blueDim)">'+(VENDOR_EMOJI[v.kat]||'✨')+'</div><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="font-size:14px;font-weight:700">'+v.nama+'</span><span class="badge '+(sClr[v.status]||'b-pending')+'">'+v.status+'</span></div><div style="font-size:11.5px;color:var(--text2);margin-bottom:6px">'+v.kat+(v.rating>0?' · <span style="color:var(--goldSoft)">'+stars(v.rating)+'</span>':'')+'</div><div style="display:flex;gap:16px;font-size:12px"><span style="font-weight:700;color:var(--blue)">'+fmt(v.harga)+'</span>'+(v.kontak?'<span style="color:var(--text3)">📱 '+v.kontak+'</span>':'')+(v.alamat?'<span style="color:var(--text3)">📍 '+v.alamat+'</span>':'')+'</div>'+(v.catatan?'<div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic">'+v.catatan+'</div>':'')+'</div><div style="display:flex;gap:5px;flex-shrink:0"><button class="tb-btn" style="height:26px;font-size:10.5px;padding:0 8px" onclick="editVendor(\''+v.id+'\')">Edit</button><button class="tb-btn" style="height:26px;font-size:10.5px;padding:0 8px;color:var(--red)" onclick="hapusVendor(\''+v.id+'\')">Hapus</button></div></div></div>').join(''):'<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text3)">Tidak ada vendor</div>';
+}
+function editVendor(id){const v=db.vendor.find(x=>x.id===id);if(!v)return;_editId.vendor=id;document.getElementById('modal-vendor-title').textContent='Edit Vendor';['vf-nama','vf-kat','vf-harga','vf-status','vf-kontak','vf-rating','vf-alamat','vf-catatan'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value=v[fid.replace('vf-','')]??'';});openModal('modal-vendor');}
+function saveVendor(){const nama=document.getElementById('vf-nama').value.trim();if(!nama){toast('Nama wajib!','err');return;}const data={nama,kat:document.getElementById('vf-kat').value,harga:parseFloat(document.getElementById('vf-harga').value)||0,status:document.getElementById('vf-status').value,kontak:document.getElementById('vf-kontak').value,rating:parseInt(document.getElementById('vf-rating').value)||0,alamat:document.getElementById('vf-alamat').value,catatan:document.getElementById('vf-catatan').value};if(_editId.vendor){const idx=db.vendor.findIndex(x=>x.id===_editId.vendor);if(idx>=0)db.vendor[idx]={...db.vendor[idx],...data};}else db.vendor.push({id:nextId('vnd','V'),...data});_editId.vendor=null;saveDB();closeModal('modal-vendor');renderVendor();toast('Vendor disimpan!');}
+function hapusVendor(id){if(!confirm('Hapus?'))return;db.vendor=db.vendor.filter(x=>x.id!==id);saveDB();renderVendor();}
+
+// ══════════════════════════════════════════════════════
+// TAMU
+// ══════════════════════════════════════════════════════
+function renderTamu(){
+  const q=(document.getElementById('tamu-srch').value||'').toLowerCase(),kel=document.getElementById('tamu-kel').value,konfirm=document.getElementById('tamu-konfirm').value;
+  const kelSel=document.getElementById('tamu-kel');
+  if(kelSel.options.length<=1){const kels=[...new Set(db.tamu.map(t=>t.kel))].sort();kels.forEach(k=>{const o=document.createElement('option');o.textContent=o.value=k;kelSel.appendChild(o);});}
+  let d=db.tamu.filter(t=>(!q||t.nama.toLowerCase().includes(q)||t.kel.toLowerCase().includes(q))&&(!kel||t.kel===kel)&&(!konfirm||t.konfirm===konfirm));
+  const totJml=db.tamu.reduce((s,t)=>s+t.jml,0),hadir=db.tamu.filter(t=>t.konfirm==='Hadir').reduce((s,t)=>s+t.jml,0),tdk=db.tamu.filter(t=>t.konfirm==='Tidak Hadir').reduce((s,t)=>s+t.jml,0);
+  document.getElementById('tamu-stats').innerHTML='<div class="stat-card"><div class="stat-label">Total Undangan</div><div class="stat-val">'+db.tamu.length+'</div><div class="stat-sub">'+totJml+' orang</div></div><div class="stat-card green"><div class="stat-label">Hadir</div><div class="stat-val green">'+hadir+'</div></div><div class="stat-card rose"><div class="stat-label">Tidak Hadir</div><div class="stat-val rose">'+tdk+'</div></div><div class="stat-card amber"><div class="stat-label">Belum Konfirmasi</div><div class="stat-val amber">'+(totJml-hadir-tdk)+'</div></div><div class="stat-card blue"><div class="stat-label">Undangan Terkirim</div><div class="stat-val blue">'+db.tamu.filter(t=>t.undangan==='Sudah').length+'</div></div>';
+  const bc={Hadir:'b-done','Tidak Hadir':'b-cancel','Belum Konfirmasi':'b-pending'};
+  let no=1;
+  document.getElementById('tamu-tbody').innerHTML=d.length?d.map(t=>'<tr><td style="color:var(--text3)">'+(no++)+'</td><td><div style="font-weight:700">'+t.nama+'</div>'+(t.catatan?'<div style="font-size:11px;color:var(--text3)">'+t.catatan+'</div>':'')+'</td><td style="color:var(--text2)">'+t.kel+'</td><td style="text-align:center;font-weight:700">'+t.jml+'</td><td><span class="badge '+(bc[t.konfirm]||'b-pending')+'">'+t.konfirm+'</span></td><td style="color:var(--text3)">'+(t.kontak||'—')+'</td><td><span class="badge '+(t.undangan==='Sudah'?'b-done':'b-pending')+'">'+t.undangan+'</span></td><td><div style="display:flex;gap:5px"><button class="tb-btn" style="height:26px;font-size:10.5px;padding:0 8px" onclick="editTamu(\''+t.id+'\')">Edit</button><button class="tb-btn" style="height:26px;font-size:10.5px;padding:0 8px;color:var(--red)" onclick="hapusTamu(\''+t.id+'\')">Hapus</button></div></td></tr>').join(''):'<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">Tidak ada tamu</td></tr>';
+}
+function editTamu(id){const t=db.tamu.find(x=>x.id===id);if(!t)return;_editId.tamu=id;document.getElementById('tf-nama').value=t.nama;document.getElementById('tf-kel').value=t.kel;document.getElementById('tf-jml').value=t.jml;document.getElementById('tf-konfirm').value=t.konfirm;document.getElementById('tf-kontak').value=t.kontak||'';document.getElementById('tf-undangan').value=t.undangan||'Belum';document.getElementById('tf-catatan').value=t.catatan||'';openModal('modal-tamu');}
+function saveTamu(){const nama=document.getElementById('tf-nama').value.trim();if(!nama){toast('Nama wajib!','err');return;}const data={nama,kel:document.getElementById('tf-kel').value,jml:parseInt(document.getElementById('tf-jml').value)||1,konfirm:document.getElementById('tf-konfirm').value,kontak:document.getElementById('tf-kontak').value,undangan:document.getElementById('tf-undangan').value,catatan:document.getElementById('tf-catatan').value};if(_editId.tamu){const idx=db.tamu.findIndex(x=>x.id===_editId.tamu);if(idx>=0)db.tamu[idx]={...db.tamu[idx],...data};}else db.tamu.push({id:nextId('tamu','TM'),...data});_editId.tamu=null;saveDB();closeModal('modal-tamu');renderTamu();toast('Tamu disimpan!');}
+function hapusTamu(id){if(!confirm('Hapus?'))return;db.tamu=db.tamu.filter(x=>x.id!==id);saveDB();renderTamu();}
+function importTamu(){toast('Fitur import CSV akan segera hadir!','info');}
+
+// ══════════════════════════════════════════════════════
+// TIMELINE
+// ══════════════════════════════════════════════════════
+function renderTimeline(){
+  const filter=document.getElementById('tl-filter').value,today=nowDate();
+  let d=[...db.timeline].sort((a,b)=>a.deadline.localeCompare(b.deadline));
+  if(filter==='Belum')d=d.filter(t=>t.status!=='Selesai');
+  if(filter==='Selesai')d=d.filter(t=>t.status==='Selesai');
+  if(filter==='Terlambat')d=d.filter(t=>t.status!=='Selesai'&&t.deadline<today);
+  const done=db.timeline.filter(t=>t.status==='Selesai').length,late=db.timeline.filter(t=>t.status!=='Selesai'&&t.deadline<today).length;
+  document.getElementById('tl-stats').innerHTML='<div class="stat-card green"><div class="stat-label">Selesai</div><div class="stat-val green">'+done+'/'+db.timeline.length+'</div><div class="prog" style="margin-top:8px"><div class="prog-fill green" style="width:'+Math.round(done/Math.max(db.timeline.length,1)*100)+'%"></div></div></div><div class="stat-card amber"><div class="stat-label">Terlambat</div><div class="stat-val '+(late>0?'red':'')+'">'+late+'</div></div><div class="stat-card blue"><div class="stat-label">Belum Selesai</div><div class="stat-val blue">'+(db.timeline.length-done)+'</div></div>';
+  const byKat={};
+  db.timeline.forEach(t=>{if(!byKat[t.kat])byKat[t.kat]={total:0,done:0};byKat[t.kat].total++;if(t.status==='Selesai')byKat[t.kat].done++;});
+  document.getElementById('tl-right').innerHTML='<div class="card"><div class="card-hdr"><span class="card-title">Progress per Kategori</span></div>'+Object.entries(byKat).map(([k,v])=>'<div class="goal-card"><div class="goal-cat"><div><div class="goal-name">'+k+'</div><div class="goal-sub">'+v.done+'/'+v.total+'</div></div><span class="badge '+(v.done===v.total?'b-done':'b-proses')+'">'+Math.round(v.done/v.total*100)+'%</span></div><div class="prog"><div class="prog-fill '+(v.done===v.total?'green':'blue')+'" style="width:'+Math.round(v.done/v.total*100)+'%"></div></div></div>').join('')+'</div>';
+  document.getElementById('tl-list').innerHTML=d.map(t=>{const dl=daysLeft(t.deadline),late2=t.deadline<today&&t.status!=='Selesai';return '<div class="tl-item"><div class="tl-dot '+(t.status==='Selesai'?'done':late2?'late':'')+'"></div><div class="tl-box '+(t.status==='Selesai'?'done':'')+'" onclick="toggleTimeline(\''+t.id+'\')"><div class="tl-date">'+t.deadline+(late2?' <span style="color:var(--red);font-weight:700">· TERLAMBAT</span>':dl>=0&&t.status!=='Selesai'?'· '+dl+' hari lagi':'')+'</div><div style="display:flex;align-items:center;justify-content:space-between"><div class="tl-title">'+t.nama+'</div><div style="display:flex;gap:5px"><button onclick="event.stopPropagation();editTimeline(\''+t.id+'\')" class="tb-btn" style="height:22px;font-size:10px;padding:0 7px">Edit</button><button onclick="event.stopPropagation();hapusTimeline(\''+t.id+'\')" class="tb-btn" style="height:22px;font-size:10px;padding:0 7px;color:var(--red)">Hapus</button></div></div><div class="tl-desc">'+t.kat+' · <span class="badge '+(t.prioritas==='Tinggi'?'b-penting':t.prioritas==='Sedang'?'b-proses':'b-pending')+'">'+t.prioritas+'</span>'+(t.catatan?' · '+t.catatan:'')+'</div></div></div>';}).join('');
+}
+function toggleTimeline(id){const t=db.timeline.find(x=>x.id===id);if(!t)return;t.status=t.status==='Selesai'?'Belum':'Selesai';saveDB();renderTimeline();toast(t.status==='Selesai'?'Selesai! ✓':'Belum selesai.','info');}
+function editTimeline(id){const t=db.timeline.find(x=>x.id===id);if(!t)return;_editId.timeline=id;document.getElementById('modal-tl-title').textContent='Edit Tugas';document.getElementById('tlf-nama').value=t.nama;document.getElementById('tlf-deadline').value=t.deadline;document.getElementById('tlf-kat').value=t.kat;document.getElementById('tlf-prioritas').value=t.prioritas;document.getElementById('tlf-status').value=t.status;document.getElementById('tlf-catatan').value=t.catatan||'';openModal('modal-timeline');}
+function saveTimeline(){const nama=document.getElementById('tlf-nama').value.trim();if(!nama){toast('Nama wajib!','err');return;}const data={nama,deadline:document.getElementById('tlf-deadline').value,kat:document.getElementById('tlf-kat').value,prioritas:document.getElementById('tlf-prioritas').value,status:document.getElementById('tlf-status').value,catatan:document.getElementById('tlf-catatan').value};if(_editId.timeline){const idx=db.timeline.findIndex(x=>x.id===_editId.timeline);if(idx>=0)db.timeline[idx]={...db.timeline[idx],...data};}else db.timeline.push({id:nextId('tl','TL'),...data});_editId.timeline=null;saveDB();closeModal('modal-timeline');renderTimeline();toast('Tugas disimpan!');}
+function hapusTimeline(id){if(!confirm('Hapus?'))return;db.timeline=db.timeline.filter(x=>x.id!==id);saveDB();renderTimeline();}
+
+// ══════════════════════════════════════════════════════
+// LAPORAN
+// ══════════════════════════════════════════════════════
+function renderLaporan(){
+  const tB=db.budget.reduce((s,b)=>s+b.budget,0),tR=db.budget.reduce((s,b)=>s+b.realisasi,0);
+  const totTamu=db.tamu.reduce((s,t)=>s+t.jml,0),tamuH=db.tamu.filter(t=>t.konfirm==='Hadir').reduce((s,t)=>s+t.jml,0);
+  document.getElementById('lap-stats').innerHTML='<div class="stat-card blue"><div class="stat-label">Total Budget</div><div class="stat-val blue">'+fmtS(tB)+'</div></div><div class="stat-card rose"><div class="stat-label">Total Dibayar</div><div class="stat-val rose">'+fmtS(tR)+'</div></div><div class="stat-card"><div class="stat-label">Sisa Budget</div><div class="stat-val '+(tB-tR>=0?'green':'red')+'">'+fmtS(tB-tR)+'</div></div><div class="stat-card"><div class="stat-label">Tamu Hadir</div><div class="stat-val">'+tamuH+'/'+totTamu+'</div></div>';
+  requestAnimationFrame(()=>{
+    const canvas=document.getElementById('lap-chart');
+    if(!canvas)return;
+    const rect=canvas.parentElement.getBoundingClientRect();
+    const W=Math.max(rect.width-44||500,200),H=220;
+    canvas.width=W;canvas.height=H;canvas.style.width='100%';
+    const ctx=canvas.getContext('2d');
+    const katMap={};
+    db.budget.forEach(b=>{if(!katMap[b.kat])katMap[b.kat]={bud:0,real:0};katMap[b.kat].bud+=b.budget;katMap[b.kat].real+=b.realisasi;});
+    const entries=Object.entries(katMap).sort((a,b)=>b[1].bud-a[1].bud);
+    const maxV=Math.max(...entries.map(e=>e[1].bud),1);
+    const pad={l:10,r:10,t:20,b:55};
+    const slotW=(W-pad.l-pad.r)/Math.max(entries.length,1);
+    const bW=Math.max(Math.floor(slotW/3)-2,4);
+    ctx.clearRect(0,0,W,H);
+    entries.forEach(([k,v],i)=>{
+      const x=pad.l+slotW*i+slotW/2;
+      const h1=Math.round(v.bud/maxV*(H-pad.t-pad.b));
+      const h2=Math.round(v.real/maxV*(H-pad.t-pad.b));
+      const g1=ctx.createLinearGradient(0,H-pad.b-h1,0,H-pad.b);g1.addColorStop(0,'#2563eb');g1.addColorStop(1,'rgba(37,99,235,0.3)');
+      ctx.fillStyle=g1;ctx.fillRect(x-bW-2,H-pad.b-h1,bW,h1);
+      const g2=ctx.createLinearGradient(0,H-pad.b-h2,0,H-pad.b);g2.addColorStop(0,'#f43f5e');g2.addColorStop(1,'rgba(244,63,94,0.3)');
+      ctx.fillStyle=g2;if(h2>0)ctx.fillRect(x+2,H-pad.b-h2,bW,h2);
+      ctx.fillStyle='#64748b';ctx.font='9px Nunito,sans-serif';ctx.textAlign='center';
+      const sk=k.length>9?k.slice(0,8)+'…':k;ctx.fillText(sk,x,H-pad.b+13);ctx.fillText(fmtS(v.bud),x,H-pad.b+24);
+    });
+    ctx.fillStyle='#2563eb';ctx.fillRect(10,8,10,5);ctx.fillStyle='#64748b';ctx.font='10px Nunito,sans-serif';ctx.textAlign='left';ctx.fillText('Budget',24,14);
+    ctx.fillStyle='#f43f5e';ctx.fillRect(80,8,10,5);ctx.fillText('Realisasi',94,14);
+  });
+  requestAnimationFrame(()=>{
+    const canvas=document.getElementById('lap-donut');if(!canvas)return;
+    const ctx=canvas.getContext('2d');ctx.clearRect(0,0,150,150);
+    const katMap={};db.budget.forEach(b=>{katMap[b.kat]=(katMap[b.kat]||0)+b.budget;});
+    const entries=Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
+    const total=entries.reduce((s,e)=>s+e[1],0)||1;
+    const colors=['#2563eb','#0ea5e9','#7c3aed','#f43f5e','#059669','#d97706','#60a5fa'];
+    let angle=-Math.PI/2;const cx=75,cy=75,R=60,r=36;
+    entries.forEach(([k,v],i)=>{const slice=v/total*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.fillStyle=colors[i%colors.length];ctx.fill();angle+=slice;});
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='var(--bg1,#fff)';ctx.fill();
+    ctx.fillStyle='#64748b';ctx.font='10px Nunito,sans-serif';ctx.textAlign='center';ctx.fillText('Total',cx,cy-5);
+    ctx.fillStyle='#0f172a';ctx.font='bold 12px Nunito,sans-serif';ctx.fillText(fmtS(total),cx,cy+10);
+    document.getElementById('lap-legend').innerHTML=entries.map(([k,v],i)=>'<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:12px"><div style="width:10px;height:10px;border-radius:3px;background:'+colors[i%colors.length]+';flex-shrink:0"></div><span style="flex:1;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+k+'</span><span style="font-weight:700;color:var(--text)">'+fmtS(v)+'</span></div>').join('');
+  });
+  document.getElementById('lap-tbody').innerHTML=db.budget.map(b=>{const sel=b.budget-b.realisasi;return '<tr><td style="color:var(--text2)">'+b.kat+'</td><td style="font-weight:600">'+b.nama+'</td><td style="font-weight:700;color:var(--blue)">'+fmt(b.budget)+'</td><td style="font-weight:700;color:var(--rose)">'+fmt(b.realisasi)+'</td><td style="font-weight:700;color:'+(sel>=0?'var(--green)':'var(--red)')+'">'+fmt(sel)+'</td><td><span class="badge '+({Lunas:'b-lunas',DP:'b-dp','Belum Bayar':'b-belum'}[b.status]||'b-pending')+'">'+b.status+'</span></td></tr>';}).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// PENGATURAN
+// ══════════════════════════════════════════════════════
+function renderPengaturan(){
+  const s=db.setting;
+  document.getElementById('set-pria').value=s.pria||'';
+  document.getElementById('set-wanita').value=s.wanita||'';
+  document.getElementById('set-tgl-nikah').value=s.tglNikah||'';
+  document.getElementById('set-lokasi').value=s.lokasi||'';
+  document.getElementById('set-total-budget').value=s.totalBudget||0;
+  if(currentUser){
+    document.getElementById('set-user-info').innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:var(--r);border:1px solid var(--border)"><div class="user-av">'+currentUser.nama.slice(0,1).toUpperCase()+'</div><div><div style="font-weight:700">'+currentUser.nama+' <span class="badge-role badge-'+currentUser.role+'">'+currentUser.role+'</span></div><div style="font-size:11px;color:var(--text3)">'+currentUser.email+'</div><div style="font-size:11px;color:var(--green)">● Sesi Aktif (Device ini)</div></div></div>';
+  }
+  const storage=(JSON.stringify(db).length/1024).toFixed(1);
+  document.getElementById('set-sysinfo').innerHTML='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text2)">Versi</span><span>maNTapps Wedding v2.0</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text2)">Item Budget</span><span>'+db.budget.length+'</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text2)">Vendor</span><span>'+db.vendor.length+'</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total Tamu</span><span>'+db.tamu.reduce((s,t)=>s+t.jml,0)+' orang</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text2)">Dokumen Selesai</span><span>'+db.dokumen.filter(d=>d.status==='Selesai').length+'/'+db.dokumen.length+'</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px"><span style="color:var(--text2)">Storage Device</span><span>'+storage+' KB</span></div>';
+}
+function savePengaturan(){
+  db.setting.pria=document.getElementById('set-pria').value.trim();
+  db.setting.wanita=document.getElementById('set-wanita').value.trim();
+  db.setting.tglNikah=document.getElementById('set-tgl-nikah').value;
+  db.setting.lokasi=document.getElementById('set-lokasi').value.trim();
+  db.setting.totalBudget=parseFloat(document.getElementById('set-total-budget').value)||0;
+  saveDB();toast('Profil pernikahan disimpan!');renderPengaturan();
+}
+
+// ══════════════════════════════════════════════════════
+// EKSPOR & BACKUP
+// ══════════════════════════════════════════════════════
+function nextId(k,p){return p+String(db.counters[k]++).padStart(3,'0');}
+function exportXLSX(){
+  const wb=XLSX.utils.book_new();
+  const bRows=[['Nama Item','Kategori','Budget (Rp)','Realisasi (Rp)','Selisih (Rp)','Status','Vendor','Catatan'],...db.budget.map(b=>[b.nama,b.kat,b.budget,b.realisasi,b.budget-b.realisasi,b.status,b.vendor,b.catatan])];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(bRows),'Budget');
+  const dRows=[['Nama Dokumen','Jenis','Untuk','Status','Prioritas','Deadline','Catatan'],...db.dokumen.map(d=>[d.nama,d.jenis,d.untuk,d.status,d.prioritas,d.deadline,d.catatan])];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(dRows),'Dokumen_KUA');
+  const vRows=[['Nama Vendor','Kategori','Harga (Rp)','Status','Kontak','Rating','Alamat','Catatan'],...db.vendor.map(v=>[v.nama,v.kat,v.harga,v.status,v.kontak,v.rating,v.alamat,v.catatan])];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(vRows),'Vendor');
+  const tRows=[['Nama','Kelompok','Jumlah','Konfirmasi','Kontak','Undangan','Catatan'],...db.tamu.map(t=>[t.nama,t.kel,t.jml,t.konfirm,t.kontak,t.undangan,t.catatan])];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(tRows),'Daftar_Tamu');
+  const tlRows=[['Tugas','Kategori','Deadline','Prioritas','Status','Catatan'],...db.timeline.map(t=>[t.nama,t.kat,t.deadline,t.prioritas,t.status,t.catatan])];
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(tlRows),'Timeline');
+  XLSX.writeFile(wb,'maNTapps_Wedding_'+nowDate()+'.xlsx');
+  toast('XLSX berhasil diunduh!');
+}
+function backupJSON(){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='maNTapps_Wedding_backup_'+nowDate()+'.json';a.click();toast('Backup berhasil!');}
+function importJSON(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=e=>{const fr=new FileReader();fr.onload=ev=>{try{db=JSON.parse(ev.target.result);saveDB();renderDashboard();toast('Data diimport!');}catch(e){toast('File tidak valid!','err');}};fr.readAsText(e.target.files[0]);};inp.click();}
+function resetData(){if(!confirm('Reset SEMUA data?'))return;if(!confirm('Konfirmasi: budget, dokumen, vendor, tamu, timeline akan dihapus?'))return;db=JSON.parse(JSON.stringify(DEFAULT_DB));saveDB();renderDashboard();toast('Data direset.','info');}
+
+</script>
+
+<!-- Modal Sinkronisasi Data -->
+<div class="modal-overlay" id="modal-sinkron">
+<div class="modal-box" style="width:520px">
+  <div class="modal-title">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    Sinkronisasi Data Antar Device
+  </div>
+
+  <div style="background:var(--blueDim);border:1px solid var(--blue4);border-radius:var(--r);padding:12px 14px;margin-bottom:18px;font-size:12.5px;color:var(--blue2);line-height:1.6">
+    <strong>Cara kerja:</strong> Buat Kode Sinkron di device lama → Salin kode → Buka aplikasi di device baru → Login → Import Kode Sinkron. Data Anda akan langsung tersedia.
+  </div>
+
+  <div class="pill-tabs" style="margin-bottom:18px">
+    <button class="pill-tab active" id="tab-export" onclick="switchSyncTab('export')">📤 Buat Kode (Device Ini)</button>
+    <button class="pill-tab" id="tab-import" onclick="switchSyncTab('import')">📥 Import Kode (Device Baru)</button>
+  </div>
+
+  <div id="sync-code-section">
+    <div class="form-group" style="margin-bottom:10px">
+      <label>Kode Sinkron Data Anda</label>
+      <textarea id="sync-code-output" readonly style="width:100%;height:120px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:monospace;font-size:10px;padding:10px;outline:none;resize:none;word-break:break-all"></textarea>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-blue" style="flex:1;height:40px;font-size:13px" onclick="buatKodeSinkron()">🔄 Buat / Perbarui Kode</button>
+      <button class="tb-btn" style="height:40px;padding:0 18px" onclick="salinKodeSinkron()">📋 Salin Kode</button>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center">Kode berisi semua data Anda (budget, tamu, vendor, dll). Simpan dengan aman.</div>
+  </div>
+
+  <div id="sync-import-section" style="display:none">
+    <div class="form-group">
+      <label>Tempel Kode Sinkron di Sini</label>
+      <textarea id="sync-code-input" placeholder="Tempel kode sinkron dari device lain..." style="width:100%;height:120px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:monospace;font-size:10px;padding:10px;outline:none;resize:none;word-break:break-all"></textarea>
+    </div>
+    <button class="btn-blue" style="width:100%;height:42px;font-size:13px" onclick="importKodeSinkron()">✅ Import & Terapkan Data</button>
+    <div style="font-size:11px;color:var(--red);margin-top:8px;text-align:center">⚠️ Data yang ada akan digantikan dengan data dari kode.</div>
+  </div>
+
+  <div class="modal-actions" style="border-top:none;padding-top:8px">
+    <button class="btn-cancel" onclick="closeModal('modal-sinkron')">Tutup</button>
+  </div>
+</div>
+</div>
+
+</body>
+</html>
