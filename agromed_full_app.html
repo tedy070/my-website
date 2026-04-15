@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroMed — Aplikasi Obat Pertanian</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark: #2d5a27;
+    --green-mid: #4a8c3f;
+    --green-light: #6db35a;
+    --green-pale: #eef6ec;
+    --green-soft: #a8d89f;
+    --bg: #f0f4ee;
+    --white: #ffffff;
+    --text-primary: #1a2e18;
+    --text-secondary: #5a7055;
+    --text-tertiary: #9ab094;
+    --border: rgba(74,140,63,0.15);
+    --border-soft: rgba(74,140,63,0.08);
+    --shadow: 0 20px 60px rgba(45,90,39,0.18), 0 4px 20px rgba(45,90,39,0.08);
+    --radius-phone: 38px;
+    --radius-inner: 30px;
+    --font: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ─── APP HEADER ─── */
+  .app-header {
+    width: 100%;
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    padding: 20px 32px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .app-header-brand { display: flex; align-items: center; gap: 10px; }
+  .app-header-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .app-header-name { color: #fff; font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
+  .app-header-sub { color: rgba(255,255,255,0.65); font-size: 10px; letter-spacing: 2px; font-weight: 500; }
+  .app-header-right { color: rgba(255,255,255,0.7); font-size: 11px; }
+
+  /* ─── SECTION LABELS ─── */
+  .section-wrapper {
+    width: 100%;
+    padding: 28px 32px 0;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--green-mid);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ─── PHONES ROW ─── */
+  .phones-row {
+    width: 100%;
+    padding: 0 32px 32px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--green-soft) transparent;
+  }
+  .phones-row::-webkit-scrollbar { height: 4px; }
+  .phones-row::-webkit-scrollbar-thumb { background: var(--green-soft); border-radius: 4px; }
+
+  /* ─── PHONE SHELL ─── */
+  .phone-wrap { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .phone {
+    width: 210px;
+    background: #111;
+    border-radius: var(--radius-phone);
+    padding: 10px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 17px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 5px;
+    background: #222;
+    border-radius: 3px;
+  }
+  .phone-inner {
+    background: var(--white);
+    border-radius: var(--radius-inner);
+    overflow: hidden;
+    height: 430px;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+    background: var(--green-pale);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    letter-spacing: 0.2px;
+  }
+
+  /* ─── SHARED ELEMENTS ─── */
+  .sb { padding: 22px 14px 4px; display: flex; justify-content: space-between; flex-shrink: 0; }
+  .sb span { font-size: 9px; color: var(--text-tertiary); font-weight: 600; }
+  .sc { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+  .btn-green { background: var(--green-mid); color: #fff; border: none; border-radius: 10px; width: 100%; padding: 10px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font); }
+  .btn-out { background: transparent; color: var(--green-mid); border: 1.5px solid var(--green-mid); border-radius: 10px; width: 100%; padding: 9px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font); margin-top: 5px; }
+  .inp { background: #f6faf5; border: 1px solid var(--border); border-radius: 9px; padding: 8px 10px; font-size: 10px; color: var(--text-tertiary); width: 100%; font-family: var(--font); }
+  .divider { height: 1px; background: var(--border-soft); margin: 6px 0; }
+  .nav { border-top: 1px solid var(--border-soft); display: flex; justify-content: space-around; padding: 6px 0 8px; flex-shrink: 0; background: var(--white); }
+  .ni { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 7px; color: var(--text-tertiary); }
+  .ni.a { color: var(--green-mid); }
+  .ni-ic { font-size: 15px; }
+  .hdr { padding: 8px 12px 6px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .back { width: 24px; height: 24px; background: var(--green-pale); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--green-dark); font-weight: 600; }
+  .hdr-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .card-sec { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 9px; margin-bottom: 6px; }
+  .sec-title { font-size: 9px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+  .row-info { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .ri-l { font-size: 8px; color: var(--text-secondary); }
+  .ri-r { font-size: 8px; color: var(--text-primary); font-weight: 600; text-align: right; }
+
+  /* ─── SCREEN SPECIFIC ─── */
+  /* S1 Splash */
+  .s1-bg { background: linear-gradient(160deg, #2d5a27 0%, #4a8c3f 45%, #6db35a 100%); flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .s1-circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.06); }
+  .s1-brand { text-align: center; z-index: 1; }
+  .s1-brand-icon { width: 52px; height: 52px; background: rgba(255,255,255,0.22); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; }
+  .s1-brand-name { color: #fff; font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
+  .s1-brand-sub { color: rgba(255,255,255,0.7); font-size: 9px; letter-spacing: 2.5px; margin-top: 3px; }
+  .s1-bottom { background: #fff; border-radius: 20px 20px 0 0; padding: 16px 16px 12px; flex-shrink: 0; }
+  .s1-reg { font-size: 10px; color: var(--text-secondary); text-align: center; margin-top: 8px; }
+  .s1-reg span { color: var(--green-mid); font-weight: 600; }
+
+  /* Products */
+  .img-pest { background: #fde8c3; }
+  .img-fert { background: #c8e4f5; }
+  .img-herb { background: #d4edc4; }
+  .img-seed { background: #f5e4c8; }
+  .img-grow { background: #e4d4f0; }
+  .img-org { background: #d4f0e4; }
+  .img-fun  { background: #d4edc4; }
+
+  /* ─── FOOTER ─── */
+  .app-footer {
+    width: 100%;
+    background: var(--green-dark);
+    padding: 16px 32px;
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    margin-top: auto;
+  }
+
+  /* Scrollable screen content */
+  .sc-scroll { flex: 1; overflow-y: auto; padding-bottom: 4px; }
+  .sc-scroll::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ APP HEADER ═══════════ -->
+<header class="app-header">
+  <div class="app-header-brand">
+    <div class="app-header-icon">🌿</div>
+    <div>
+      <div class="app-header-name">AgroMed</div>
+      <div class="app-header-sub">AGRO SOLUTION</div>
+    </div>
+  </div>
+  <div class="app-header-right">E-Catalog Produk Pertanian</div>
+</header>
+
+<!-- ═══════════ ROW 1: ONBOARDING ═══════════ -->
+<div class="section-wrapper">
+  <div class="section-label">🔐 Autentikasi & Onboarding</div>
+</div>
+<div class="phones-row">
+
+  <!-- 1. SPLASH / HOME SCREEN -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div class="s1-bg">
+            <div class="s1-circle" style="width:90px;height:90px;top:-25px;left:-25px;"></div>
+            <div class="s1-circle" style="width:60px;height:60px;bottom:70px;right:-18px;"></div>
+            <div class="s1-circle" style="width:32px;height:32px;top:50px;right:14px;"></div>
+            <div class="s1-brand">
+              <div class="s1-brand-icon">🌿</div>
+              <div class="s1-brand-name">AgroMed</div>
+              <div class="s1-brand-sub">AGRO SOLUTION</div>
+            </div>
+          </div>
+          <div class="s1-bottom">
+            <button class="btn-green">Masuk</button>
+            <div class="s1-reg">Belum punya akun? <span>Daftar</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Splash Screen</div>
+  </div>
+
+  <!-- 2. LOGIN -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc" style="padding:0 14px;overflow-y:auto;">
+          <div style="text-align:center;padding:16px 0 12px;">
+            <div style="width:46px;height:46px;background:var(--green-pale);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:22px;">🌿</div>
+            <div style="font-size:15px;font-weight:700;color:var(--text-primary);">Selamat Datang</div>
+            <div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Masuk ke akun AgroMed Anda</div>
+          </div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">Email / No. HP</div>
+          <div class="inp" style="margin-bottom:8px;">budi@email.com</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <div style="font-size:9px;color:var(--text-secondary);font-weight:500;">Kata Sandi</div>
+            <div style="font-size:8px;color:var(--green-mid);font-weight:600;">Lupa sandi?</div>
+          </div>
+          <div class="inp" style="margin-bottom:10px;display:flex;justify-content:space-between;"><span>••••••••</span><span style="font-size:10px;">👁</span></div>
+          <button class="btn-green">Masuk</button>
+          <div style="display:flex;align-items:center;gap:6px;margin:8px 0;">
+            <div style="flex:1;height:1px;background:var(--border);"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);">atau</span>
+            <div style="flex:1;height:1px;background:var(--border);"></div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:10px;padding:7px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+            <span style="font-size:13px;font-weight:700;color:#4285f4;">G</span><span style="font-size:10px;color:var(--text-secondary);">Lanjutkan dengan Google</span>
+          </div>
+          <div style="text-align:center;font-size:9px;color:var(--text-secondary);">Belum punya akun? <span style="color:var(--green-mid);font-weight:600;">Daftar</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Login</div>
+  </div>
+
+  <!-- 3. REGISTER -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc" style="padding:0 14px;overflow-y:auto;">
+          <div style="padding:10px 0 8px;">
+            <div style="font-size:15px;font-weight:700;color:var(--text-primary);">Buat Akun Baru</div>
+            <div style="font-size:9px;color:var(--text-secondary);margin-top:2px;">Daftarkan diri untuk mulai berbelanja</div>
+          </div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">Nama Lengkap</div>
+          <div class="inp" style="margin-bottom:6px;">Budi Santoso</div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">No. Telepon</div>
+          <div class="inp" style="margin-bottom:6px;display:flex;gap:4px;"><span style="color:var(--text-secondary);">+62</span><span>812-3456-7890</span></div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">Email</div>
+          <div class="inp" style="margin-bottom:6px;">budi@email.com</div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">Kata Sandi</div>
+          <div class="inp" style="margin-bottom:6px;">••••••••</div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">Konfirmasi Sandi</div>
+          <div class="inp" style="margin-bottom:8px;">••••••••</div>
+          <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:10px;">
+            <div style="width:13px;height:13px;border-radius:3px;background:var(--green-mid);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;">✓</div>
+            <div style="font-size:8px;color:var(--text-secondary);line-height:1.5;">Saya setuju dengan <span style="color:var(--green-mid);">Syarat & Ketentuan</span> dan <span style="color:var(--green-mid);">Kebijakan Privasi</span></div>
+          </div>
+          <button class="btn-green">Daftar Sekarang</button>
+          <div style="text-align:center;font-size:9px;color:var(--text-secondary);margin-top:7px;">Sudah punya akun? <span style="color:var(--green-mid);font-weight:600;">Masuk</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Register</div>
+  </div>
+
+  <!-- 4. OTP -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc" style="padding:0 14px;display:flex;flex-direction:column;align-items:center;">
+          <div style="margin-top:22px;width:58px;height:58px;background:var(--green-pale);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;">📱</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-top:10px;text-align:center;">Verifikasi OTP</div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-top:4px;text-align:center;line-height:1.6;">Kode OTP telah dikirim ke<br><span style="font-weight:600;color:var(--text-primary);">+62 812-3456-7890</span></div>
+          <div style="display:flex;gap:8px;margin-top:20px;">
+            <div style="width:40px;height:46px;background:#f6faf5;border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--text-primary);">5</div>
+            <div style="width:40px;height:46px;background:#f6faf5;border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--text-primary);">8</div>
+            <div style="width:40px;height:46px;background:#f6faf5;border:2px solid var(--green-mid);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--green-mid);">3</div>
+            <div style="width:40px;height:46px;background:#f6faf5;border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--text-tertiary);">_</div>
+          </div>
+          <div style="margin-top:12px;font-size:9px;color:var(--text-secondary);">Kirim ulang dalam <span style="font-weight:600;color:var(--green-mid);">02:45</span></div>
+          <div style="width:100%;margin-top:18px;">
+            <button class="btn-green">Verifikasi</button>
+          </div>
+          <div style="text-align:center;font-size:9px;color:var(--text-secondary);margin-top:7px;">Tidak menerima kode? <span style="color:var(--green-mid);font-weight:600;">Kirim ulang</span></div>
+          <div style="margin-top:14px;background:#fff8e1;border-radius:9px;padding:8px;width:100%;">
+            <div style="font-size:8px;color:#8a5c00;line-height:1.4;">⚠ Jangan bagikan kode OTP kepada siapapun termasuk pihak AgroMed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">OTP Verifikasi</div>
+  </div>
+
+  <!-- 5. LUPA PASSWORD -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc" style="padding:0 14px;">
+          <div class="hdr" style="padding:8px 0 10px;">
+            <div class="back">‹</div>
+            <div class="hdr-title">Lupa Kata Sandi</div>
+          </div>
+          <div style="width:62px;height:62px;background:var(--green-pale);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;">🔐</div>
+          <div style="font-size:12px;font-weight:700;text-align:center;color:var(--text-primary);">Reset Kata Sandi</div>
+          <div style="font-size:9px;color:var(--text-secondary);text-align:center;margin:4px 0 14px;line-height:1.5;">Masukkan email terdaftar untuk menerima link reset kata sandi</div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">Alamat Email</div>
+          <div class="inp" style="margin-bottom:9px;">budi@email.com</div>
+          <button class="btn-green" style="margin-bottom:8px;">Kirim Link Reset</button>
+          <div class="divider"></div>
+          <div style="font-size:9px;color:var(--text-secondary);margin-bottom:6px;font-weight:600;">Atau reset via:</div>
+          <div style="border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+            <span style="font-size:15px;">📱</span>
+            <div><div style="font-size:9px;font-weight:600;color:var(--text-primary);">SMS ke +62 812-xxx-7890</div><div style="font-size:8px;color:var(--text-tertiary);">Kirim kode verifikasi via SMS</div></div>
+            <div style="margin-left:auto;width:14px;height:14px;border-radius:50%;border:1px solid var(--border);"></div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:15px;">💬</span>
+            <div><div style="font-size:9px;font-weight:600;color:var(--text-primary);">WhatsApp ke +62 812-xxx-7890</div><div style="font-size:8px;color:var(--text-tertiary);">Kirim kode via WhatsApp</div></div>
+            <div style="margin-left:auto;width:14px;height:14px;border-radius:50%;border:2px solid var(--green-mid);display:flex;align-items:center;justify-content:center;"><div style="width:7px;height:7px;border-radius:50%;background:var(--green-mid);"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Lupa Password</div>
+  </div>
+
+</div>
+
+<!-- ═══════════ ROW 2: BERANDA & KATALOG ═══════════ -->
+<div class="section-wrapper">
+  <div class="section-label">🏠 Beranda & Katalog Produk</div>
+</div>
+<div class="phones-row">
+
+  <!-- 6. BERANDA / HOME PAGE -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner" style="position:relative;">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc" style="overflow:hidden;">
+          <div style="padding:6px 12px 4px;flex-shrink:0;">
+            <div style="font-size:10px;font-weight:600;color:var(--text-primary);">Halo, Budi Santoso 👋</div>
+            <div style="font-size:9px;color:var(--green-mid);display:flex;align-items:center;gap:2px;">📍 Karawang, Jawa Barat</div>
+          </div>
+          <div style="background:#f6faf5;border-radius:9px;padding:5px 8px;font-size:9px;color:var(--text-tertiary);margin:4px 12px;border:1px solid var(--border);display:flex;align-items:center;gap:4px;flex-shrink:0;">🔍 <span>Cari produk pertanian...</span></div>
+          <div style="margin:0 12px 6px;background:linear-gradient(120deg,#2d5a27,#4a8c3f);border-radius:12px;padding:10px;flex-shrink:0;">
+            <div style="background:rgba(255,255,255,0.9);color:#2d5a27;font-size:7px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-bottom:4px;">Pestisida Unggulan</div>
+            <div style="color:#fff;font-size:10px;font-weight:600;">Dapatkan Diskon Spesial</div>
+            <div style="display:flex;align-items:baseline;gap:4px;">
+              <div style="color:rgba(255,255,255,0.8);font-size:8px;">Up to</div>
+              <div style="color:#a8e08c;font-size:20px;font-weight:700;">15%</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;padding:0 12px;margin-bottom:5px;overflow-x:auto;flex-shrink:0;">
+            <div style="font-size:8px;padding:3px 9px;border-radius:10px;background:var(--green-mid);color:#fff;white-space:nowrap;flex-shrink:0;">Semua</div>
+            <div style="font-size:8px;padding:3px 9px;border-radius:10px;background:#f6faf5;color:var(--text-secondary);white-space:nowrap;border:1px solid var(--border);flex-shrink:0;">Pestisida</div>
+            <div style="font-size:8px;padding:3px 9px;border-radius:10px;background:#f6faf5;color:var(--text-secondary);white-space:nowrap;border:1px solid var(--border);flex-shrink:0;">Pupuk</div>
+            <div style="font-size:8px;padding:3px 9px;border-radius:10px;background:#f6faf5;color:var(--text-secondary);white-space:nowrap;border:1px solid var(--border);flex-shrink:0;">Herbisida</div>
+          </div>
+          <div style="padding:0 12px 4px;font-size:10px;font-weight:600;color:var(--text-primary);flex-shrink:0;">Produk Terlaris</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px;overflow-y:auto;flex:1;padding-bottom:46px;">
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+              <div class="img-pest" style="width:100%;height:60px;display:flex;align-items:center;justify-content:center;font-size:22px;">🧴</div>
+              <div style="padding:5px 7px;">
+                <div style="font-size:9px;font-weight:600;">Pestisida Decis</div>
+                <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Insektisida kontak, efektif</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;font-weight:600;color:var(--green-mid);">45<span style="font-size:7px;">RB</span></div>
+                  <div style="width:17px;height:17px;background:var(--green-mid);border-radius:5px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:300;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+              <div class="img-fert" style="width:100%;height:60px;display:flex;align-items:center;justify-content:center;font-size:22px;">💧</div>
+              <div style="padding:5px 7px;">
+                <div style="font-size:9px;font-weight:600;">Pupuk NPK</div>
+                <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Formulasi N-P-K 16-16-16</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;font-weight:600;color:var(--green-mid);">35<span style="font-size:7px;">RB</span></div>
+                  <div style="width:17px;height:17px;background:var(--green-mid);border-radius:5px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:300;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+              <div class="img-herb" style="width:100%;height:60px;display:flex;align-items:center;justify-content:center;font-size:22px;">🌱</div>
+              <div style="padding:5px 7px;">
+                <div style="font-size:9px;font-weight:600;">Gramoxone</div>
+                <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Pembasmi gulma kontak</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;font-weight:600;color:var(--green-mid);">60<span style="font-size:7px;">RB</span></div>
+                  <div style="width:17px;height:17px;background:var(--green-mid);border-radius:5px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:300;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+              <div class="img-seed" style="width:100%;height:60px;display:flex;align-items:center;justify-content:center;font-size:22px;">🌾</div>
+              <div style="padding:5px 7px;">
+                <div style="font-size:9px;font-weight:600;">Benih Padi IR64</div>
+                <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Varietas unggul tinggi</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:10px;font-weight:600;color:var(--green-mid);">25<span style="font-size:7px;">RB</span></div>
+                  <div style="width:17px;height:17px;background:var(--green-mid);border-radius:5px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:300;">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav" style="position:absolute;bottom:0;left:0;right:0;">
+            <div class="ni a"><span class="ni-ic">🏠</span><span>Beranda</span></div>
+            <div class="ni"><span class="ni-ic">🤍</span><span>Favorit</span></div>
+            <div class="ni"><span class="ni-ic">🛒</span><span>Keranjang</span></div>
+            <div class="ni"><span class="ni-ic">👤</span><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Beranda</div>
+  </div>
+
+  <!-- 7. PRODUCT LIST PAGE -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div class="hdr">
+            <div class="back">‹</div>
+            <div class="hdr-title">Katalog Produk</div>
+          </div>
+          <div style="background:#f6faf5;border-radius:9px;padding:5px 8px;font-size:9px;color:var(--text-tertiary);margin:0 12px 6px;border:1px solid var(--border);display:flex;align-items:center;gap:4px;flex-shrink:0;">🔍 <span>Cari produk...</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;padding:0 10px;overflow-y:auto;flex:1;padding-bottom:12px;">
+            <div style="background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+              <div class="img-pest" style="width:100%;height:52px;display:flex;align-items:center;justify-content:center;font-size:20px;">🧴</div>
+              <div style="padding:4px;">
+                <div style="font-size:8px;font-weight:600;">Curacron EC</div>
+                <div style="font-size:6.5px;color:var(--text-tertiary);margin:1px 0 2px;">Insektisida 100ml</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:8.5px;font-weight:600;color:var(--green-mid);">78RB</div>
+                  <div style="width:14px;height:14px;background:var(--green-mid);border-radius:3px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+              <div class="img-fun" style="width:100%;height:52px;display:flex;align-items:center;justify-content:center;font-size:20px;">🌿</div>
+              <div style="padding:4px;">
+                <div style="font-size:8px;font-weight:600;">Dithane M-45</div>
+                <div style="font-size:6.5px;color:var(--text-tertiary);margin:1px 0 2px;">Fungisida 200gr</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:8.5px;font-weight:600;color:var(--green-mid);">55RB</div>
+                  <div style="width:14px;height:14px;background:var(--green-mid);border-radius:3px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+              <div class="img-fert" style="width:100%;height:52px;display:flex;align-items:center;justify-content:center;font-size:20px;">💧</div>
+              <div style="padding:4px;">
+                <div style="font-size:8px;font-weight:600;">NPK Mutiara</div>
+                <div style="font-size:6.5px;color:var(--text-tertiary);margin:1px 0 2px;">Pupuk 1kg</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:8.5px;font-weight:600;color:var(--green-mid);">35RB</div>
+                  <div style="width:14px;height:14px;background:var(--green-mid);border-radius:3px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+              <div class="img-herb" style="width:100%;height:52px;display:flex;align-items:center;justify-content:center;font-size:20px;">🌱</div>
+              <div style="padding:4px;">
+                <div style="font-size:8px;font-weight:600;">Gramoxone</div>
+                <div style="font-size:6.5px;color:var(--text-tertiary);margin:1px 0 2px;">Herbisida 500ml</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:8.5px;font-weight:600;color:var(--green-mid);">60RB</div>
+                  <div style="width:14px;height:14px;background:var(--green-mid);border-radius:3px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+              <div class="img-seed" style="width:100%;height:52px;display:flex;align-items:center;justify-content:center;font-size:20px;">🌾</div>
+              <div style="padding:4px;">
+                <div style="font-size:8px;font-weight:600;">Benih Padi</div>
+                <div style="font-size:6.5px;color:var(--text-tertiary);margin:1px 0 2px;">Benih 5kg</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:8.5px;font-weight:600;color:var(--green-mid);">25RB</div>
+                  <div style="width:14px;height:14px;background:var(--green-mid);border-radius:3px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+              <div class="img-grow" style="width:100%;height:52px;display:flex;align-items:center;justify-content:center;font-size:20px;">🧪</div>
+              <div style="padding:4px;">
+                <div style="font-size:8px;font-weight:600;">ZPT Atonik</div>
+                <div style="font-size:6.5px;color:var(--text-tertiary);margin:1px 0 2px;">Perangsang 100ml</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div style="font-size:8.5px;font-weight:600;color:var(--green-mid);">42RB</div>
+                  <div style="width:14px;height:14px;background:var(--green-mid);border-radius:3px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Halaman Produk</div>
+  </div>
+
+  <!-- 8. DETAIL PRODUK / CHECKOUT -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div class="hdr">
+            <div class="back">‹</div>
+            <div class="hdr-title">Detail Produk</div>
+          </div>
+          <div style="width:100%;height:100px;background:#fde8c3;display:flex;align-items:center;justify-content:center;font-size:44px;flex-shrink:0;">🧴</div>
+          <div style="padding:8px 12px;overflow-y:auto;flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Curacron 500 EC</div>
+            <div style="display:flex;align-items:center;gap:3px;margin:3px 0 6px;">
+              <span style="color:#e8a020;font-size:9px;">★★★★☆</span>
+              <span style="color:var(--text-secondary);font-size:9px;">(4.2) 128 ulasan</span>
+            </div>
+            <div style="font-size:10px;font-weight:600;margin-bottom:3px;color:var(--text-primary);">Deskripsi</div>
+            <div style="font-size:9px;color:var(--text-secondary);line-height:1.5;margin-bottom:7px;">Insektisida kontak dan lambung berbahan aktif profenofos 500 g/L. Efektif mengendalikan hama thrips, ulat, dan kutu daun pada berbagai tanaman hortikultura.</div>
+            <div style="font-size:10px;font-weight:600;margin-bottom:4px;color:var(--text-primary);">Foto Produk</div>
+            <div style="display:flex;gap:4px;margin-bottom:8px;">
+              <div style="width:36px;height:36px;border-radius:7px;background:#fde8c3;display:flex;align-items:center;justify-content:center;font-size:15px;border:1px solid var(--border);">🧴</div>
+              <div style="width:36px;height:36px;border-radius:7px;background:#fde8c3;display:flex;align-items:center;justify-content:center;font-size:15px;border:1px solid var(--border);">📦</div>
+              <div style="width:36px;height:36px;border-radius:7px;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:600;">+4</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="width:23px;height:23px;border-radius:6px;background:#f6faf5;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:300;">−</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-primary);">1</div>
+              <div style="width:23px;height:23px;border-radius:6px;background:#f6faf5;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:300;">+</div>
+              <div style="font-size:9px;color:var(--text-secondary);">Stok tersedia: 50 pcs</div>
+            </div>
+          </div>
+          <div style="padding:8px 12px 10px;border-top:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div>
+              <div style="font-size:9px;color:var(--text-secondary);">Harga</div>
+              <div style="font-size:17px;font-weight:700;color:var(--green-mid);">Rp 78.000</div>
+            </div>
+            <button class="btn-green" style="width:auto;padding:9px 16px;">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Detail Produk</div>
+  </div>
+
+  <!-- 9. FAVORIT -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div style="padding:8px 12px 6px;font-size:13px;font-weight:700;color:var(--text-primary);flex-shrink:0;">Produk Favorit</div>
+          <div style="padding:0 12px;flex:1;overflow-y:auto;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+              <div style="background:#fff;border:1px solid var(--border);border-radius:11px;overflow:hidden;">
+                <div class="img-pest" style="width:100%;height:65px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;">🧴<div style="position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.92);border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;">❤️</div></div>
+                <div style="padding:5px 7px;">
+                  <div style="font-size:9px;font-weight:600;">Curacron 500 EC</div>
+                  <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Insektisida 100ml</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="font-size:10px;font-weight:600;color:var(--green-mid);">Rp 78.000</div>
+                    <div style="width:16px;height:16px;background:var(--green-mid);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">+</div>
+                  </div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--border);border-radius:11px;overflow:hidden;">
+                <div class="img-fun" style="width:100%;height:65px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;">🌿<div style="position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.92);border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;">❤️</div></div>
+                <div style="padding:5px 7px;">
+                  <div style="font-size:9px;font-weight:600;">Dithane M-45</div>
+                  <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Fungisida 200gr</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="font-size:10px;font-weight:600;color:var(--green-mid);">Rp 55.000</div>
+                    <div style="width:16px;height:16px;background:var(--green-mid);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">+</div>
+                  </div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--border);border-radius:11px;overflow:hidden;">
+                <div class="img-fert" style="width:100%;height:65px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;">💧<div style="position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.92);border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;">❤️</div></div>
+                <div style="padding:5px 7px;">
+                  <div style="font-size:9px;font-weight:600;">NPK Mutiara</div>
+                  <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Pupuk 1kg</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="font-size:10px;font-weight:600;color:var(--green-mid);">Rp 35.000</div>
+                    <div style="width:16px;height:16px;background:var(--green-mid);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">+</div>
+                  </div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid var(--border);border-radius:11px;overflow:hidden;">
+                <div class="img-seed" style="width:100%;height:65px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;">🌾<div style="position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.92);border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-size:10px;">❤️</div></div>
+                <div style="padding:5px 7px;">
+                  <div style="font-size:9px;font-weight:600;">Benih Padi IR64</div>
+                  <div style="font-size:7px;color:var(--text-tertiary);margin:1px 0 3px;">Benih 5kg</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="font-size:10px;font-weight:600;color:var(--green-mid);">Rp 45.000</div>
+                    <div style="width:16px;height:16px;background:var(--green-mid);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">+</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav">
+            <div class="ni"><span class="ni-ic">🏠</span><span>Beranda</span></div>
+            <div class="ni a"><span class="ni-ic">❤️</span><span>Favorit</span></div>
+            <div class="ni"><span class="ni-ic">🛒</span><span>Keranjang</span></div>
+            <div class="ni"><span class="ni-ic">👤</span><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Favorit</div>
+  </div>
+
+</div>
+
+<!-- ═══════════ ROW 3: PROSES TRANSAKSI ═══════════ -->
+<div class="section-wrapper">
+  <div class="section-label">🛒 Proses Pemesanan & Transaksi</div>
+</div>
+<div class="phones-row">
+
+  <!-- 10. KERANJANG -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner" style="position:relative;">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc" style="overflow:hidden;">
+          <div style="padding:6px 12px 5px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-primary);">Keranjang</div>
+            <div style="font-size:9px;color:var(--green-mid);font-weight:600;">Pilih Semua</div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:0 12px;padding-bottom:82px;">
+            <div style="background:#fff;border:1px solid var(--border);border-radius:11px;padding:8px;margin-bottom:6px;">
+              <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div style="width:14px;height:14px;border-radius:4px;background:var(--green-mid);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;">✓</div>
+                <div class="img-pest" style="width:50px;height:50px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🧴</div>
+                <div style="flex:1;">
+                  <div style="font-size:9px;font-weight:600;">Curacron 500 EC</div>
+                  <div style="font-size:8px;color:var(--text-tertiary);margin:1px 0;">100ml / Insektisida</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--green-mid);">Rp 78.000</div>
+                    <div style="display:flex;align-items:center;gap:5px;">
+                      <div style="width:19px;height:19px;border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-secondary);">−</div>
+                      <div style="font-size:11px;font-weight:700;">2</div>
+                      <div style="width:19px;height:19px;background:var(--green-mid);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;">+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:11px;padding:8px;margin-bottom:6px;">
+              <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div style="width:14px;height:14px;border-radius:4px;background:var(--green-mid);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;">✓</div>
+                <div class="img-fert" style="width:50px;height:50px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💧</div>
+                <div style="flex:1;">
+                  <div style="font-size:9px;font-weight:600;">Pupuk NPK Mutiara</div>
+                  <div style="font-size:8px;color:var(--text-tertiary);margin:1px 0;">1 kg / Pupuk</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--green-mid);">Rp 35.000</div>
+                    <div style="display:flex;align-items:center;gap:5px;">
+                      <div style="width:19px;height:19px;border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-secondary);">−</div>
+                      <div style="font-size:11px;font-weight:700;">3</div>
+                      <div style="width:19px;height:19px;background:var(--green-mid);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;">+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="background:var(--green-pale);border-radius:9px;padding:7px;margin-bottom:4px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:13px;">🎁</span>
+                <div style="flex:1;font-size:8px;color:var(--green-dark);">Kode promo <span style="font-weight:700;">AGRO15</span> berhasil dipakai! Hemat Rp 23.100</div>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-soft);padding:8px 12px 10px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <div style="font-size:9px;color:var(--text-secondary);">Total (5 produk)</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text-primary);">Rp 323.900</div>
+            </div>
+            <button class="btn-green" style="padding:9px;">Lanjut ke Pembayaran</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Keranjang</div>
+  </div>
+
+  <!-- 11. FORM ALAMAT -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div class="hdr"><div class="back">‹</div><div class="hdr-title">Alamat Pengiriman</div></div>
+          <!-- Step indicator -->
+          <div style="display:flex;align-items:center;gap:4px;padding:0 14px;margin-bottom:8px;flex-shrink:0;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;">1</div>
+              <div style="font-size:6.5px;color:var(--green-mid);font-weight:600;">Alamat</div>
+            </div>
+            <div style="flex:1;height:1px;background:var(--green-mid);margin-bottom:12px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:#f6faf5;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--text-tertiary);">2</div>
+              <div style="font-size:6.5px;color:var(--text-tertiary);">Bayar</div>
+            </div>
+            <div style="flex:1;height:1px;background:var(--border);margin-bottom:12px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:#f6faf5;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--text-tertiary);">3</div>
+              <div style="font-size:6.5px;color:var(--text-tertiary);">Selesai</div>
+            </div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:0 12px;">
+            <div class="card-sec">
+              <div class="sec-title">📍 Informasi Penerima</div>
+              <div style="font-size:8px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">Nama penerima</div>
+              <div class="inp" style="margin-bottom:5px;">Budi Santoso</div>
+              <div style="font-size:8px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">No. telepon</div>
+              <div class="inp">+62 812-3456-7890</div>
+            </div>
+            <div class="card-sec">
+              <div class="sec-title">🏠 Detail Alamat</div>
+              <div class="inp" style="margin-bottom:5px;">Jawa Barat</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;">
+                <div class="inp">Karawang</div>
+                <div class="inp">Karawang Barat</div>
+              </div>
+              <div style="background:#f6faf5;border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:8px;color:var(--text-tertiary);height:36px;">Jl. Pertanian No. 12, RT 03/RW 05</div>
+            </div>
+            <div class="card-sec">
+              <div class="sec-title">🚚 Pilih Kurir</div>
+              <div style="display:flex;gap:4px;">
+                <div style="flex:1;border:2px solid var(--green-mid);border-radius:9px;padding:5px;text-align:center;">
+                  <div style="font-size:8px;font-weight:700;color:var(--green-mid);">JNE</div>
+                  <div style="font-size:7px;color:var(--text-secondary);">2–3 hari</div>
+                  <div style="font-size:8px;color:var(--green-mid);font-weight:600;">Rp 12.000</div>
+                </div>
+                <div style="flex:1;border:1px solid var(--border);border-radius:9px;padding:5px;text-align:center;">
+                  <div style="font-size:8px;font-weight:600;color:var(--text-primary);">SiCepat</div>
+                  <div style="font-size:7px;color:var(--text-secondary);">1–2 hari</div>
+                  <div style="font-size:8px;font-weight:600;">Rp 18.000</div>
+                </div>
+                <div style="flex:1;border:1px solid var(--border);border-radius:9px;padding:5px;text-align:center;">
+                  <div style="font-size:8px;font-weight:600;color:var(--text-primary);">Gojek</div>
+                  <div style="font-size:7px;color:var(--text-secondary);">Same day</div>
+                  <div style="font-size:8px;font-weight:600;">Rp 25.000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:7px 12px 9px;border-top:1px solid var(--border-soft);flex-shrink:0;">
+            <button class="btn-green">Lanjut ke Pembayaran</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Form Alamat</div>
+  </div>
+
+  <!-- 12. PEMBAYARAN -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div class="hdr"><div class="back">‹</div><div class="hdr-title">Metode Pembayaran</div></div>
+          <div style="display:flex;align-items:center;gap:4px;padding:0 14px;margin-bottom:8px;flex-shrink:0;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;">✓</div>
+              <div style="font-size:6.5px;color:var(--green-mid);">Alamat</div>
+            </div>
+            <div style="flex:1;height:1px;background:var(--green-mid);margin-bottom:12px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;">2</div>
+              <div style="font-size:6.5px;color:var(--green-mid);font-weight:600;">Bayar</div>
+            </div>
+            <div style="flex:1;height:1px;background:var(--border);margin-bottom:12px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:18px;height:18px;border-radius:50%;background:#f6faf5;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--text-tertiary);">3</div>
+              <div style="font-size:6.5px;color:var(--text-tertiary);">Selesai</div>
+            </div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:0 12px;">
+            <div class="card-sec" style="margin-bottom:8px;">
+              <div class="sec-title">Ringkasan Pesanan</div>
+              <div class="row-info"><div class="ri-l">Subtotal (5 item)</div><div class="ri-r">Rp 347.000</div></div>
+              <div class="row-info"><div class="ri-l">Ongkos kirim</div><div class="ri-r">Rp 12.000</div></div>
+              <div class="row-info"><div class="ri-l">Diskon promo</div><div class="ri-r" style="color:var(--green-mid);">-Rp 23.100</div></div>
+              <div class="divider"></div>
+              <div class="row-info"><div class="ri-l" style="font-weight:700;color:var(--text-primary);">Total</div><div class="ri-r" style="font-size:11px;color:var(--green-mid);">Rp 335.900</div></div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:var(--text-primary);margin-bottom:5px;">Metode Pembayaran</div>
+            <div style="border:2px solid var(--green-mid);border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+              <span style="font-size:15px;">🏦</span>
+              <div style="flex:1;"><div style="font-size:9px;font-weight:600;">Transfer Bank</div><div style="font-size:7.5px;color:var(--text-secondary);">BCA, Mandiri, BNI, BRI</div></div>
+              <div style="width:14px;height:14px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;">✓</div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+              <span style="font-size:15px;">💳</span>
+              <div style="flex:1;"><div style="font-size:9px;font-weight:600;">Kartu Kredit/Debit</div><div style="font-size:7.5px;color:var(--text-secondary);">Visa, Mastercard, GPN</div></div>
+              <div style="width:14px;height:14px;border-radius:50%;border:1px solid var(--border);"></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+              <span style="font-size:15px;">📲</span>
+              <div style="flex:1;"><div style="font-size:9px;font-weight:600;">QRIS</div><div style="font-size:7.5px;color:var(--text-secondary);">GoPay, OVO, Dana, ShopeePay</div></div>
+              <div style="width:14px;height:14px;border-radius:50%;border:1px solid var(--border);"></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:10px;padding:8px;display:flex;align-items:center;gap:8px;">
+              <span style="font-size:15px;">🏪</span>
+              <div style="flex:1;"><div style="font-size:9px;font-weight:600;">Bayar di Tempat (COD)</div><div style="font-size:7.5px;color:var(--text-secondary);">Bayar saat barang tiba</div></div>
+              <div style="width:14px;height:14px;border-radius:50%;border:1px solid var(--border);"></div>
+            </div>
+          </div>
+          <div style="padding:7px 12px 9px;border-top:1px solid var(--border-soft);flex-shrink:0;">
+            <button class="btn-green">Bayar Rp 335.900</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Pembayaran</div>
+  </div>
+
+  <!-- 13. KONFIRMASI SUKSES -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc" style="align-items:center;padding:0 14px;overflow-y:auto;">
+          <div style="text-align:center;padding-top:18px;">
+            <div style="width:62px;height:62px;background:var(--green-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:28px;">✅</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Pesanan Berhasil!</div>
+            <div style="font-size:9px;color:var(--text-secondary);margin-top:4px;line-height:1.5;">Pesanan Anda sedang diproses.<br>Estimasi tiba 2–3 hari kerja.</div>
+          </div>
+          <div style="width:100%;background:var(--green-pale);border-radius:11px;padding:10px;margin:10px 0;">
+            <div style="font-size:8px;color:var(--text-secondary);margin-bottom:2px;">Nomor Pesanan</div>
+            <div style="font-size:13px;font-weight:700;color:var(--green-dark);">#AGM-2024-0892</div>
+          </div>
+          <div style="width:100%;border:1px solid var(--border);border-radius:11px;padding:9px;margin-bottom:8px;">
+            <div class="row-info" style="margin-bottom:4px;"><div class="ri-l">Total bayar</div><div class="ri-r" style="color:var(--green-mid);font-size:10px;">Rp 335.900</div></div>
+            <div class="row-info" style="margin-bottom:4px;"><div class="ri-l">Metode bayar</div><div class="ri-r">Transfer BCA</div></div>
+            <div class="row-info" style="margin-bottom:4px;"><div class="ri-l">Dikirim ke</div><div class="ri-r">Karawang, Jawa Barat</div></div>
+            <div class="row-info"><div class="ri-l">Kurir</div><div class="ri-r">JNE REG</div></div>
+          </div>
+          <div style="background:#fff8e1;border-radius:10px;padding:9px;width:100%;margin-bottom:10px;">
+            <div style="font-size:8px;font-weight:700;color:#8a5c00;margin-bottom:3px;">⏰ Segera Bayar Sebelum</div>
+            <div style="font-size:15px;font-weight:700;color:#8a5c00;">23:45:12</div>
+            <div style="font-size:7.5px;color:#8a5c00;margin-top:2px;">Transfer ke BCA: 1234-5678-9012</div>
+          </div>
+          <button class="btn-green" style="width:100%;margin-bottom:6px;">Lihat Detail Pesanan</button>
+          <button class="btn-out">Kembali ke Beranda</button>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Konfirmasi Pesanan</div>
+  </div>
+
+</div>
+
+<!-- ═══════════ ROW 4: PASCA PEMBELIAN ═══════════ -->
+<div class="section-wrapper">
+  <div class="section-label">📦 Pasca Pembelian & Akun</div>
+</div>
+<div class="phones-row">
+
+  <!-- 14. STATUS PESANAN -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div class="hdr"><div class="back">‹</div><div class="hdr-title">Status Pesanan</div></div>
+          <div style="flex:1;overflow-y:auto;padding:0 12px;">
+            <div style="background:var(--green-pale);border-radius:11px;padding:9px;margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div style="font-size:9px;font-weight:700;color:var(--green-dark);">#AGM-2024-0892</div>
+                <div style="background:var(--green-mid);color:#fff;font-size:7px;padding:2px 8px;border-radius:6px;font-weight:600;">Dalam Pengiriman</div>
+              </div>
+              <div style="font-size:8px;color:var(--text-secondary);">14 April 2024 • JNE REG • 3 produk</div>
+            </div>
+            <div style="position:relative;padding-left:22px;">
+              <div style="position:absolute;left:7px;top:0;bottom:0;width:1.5px;background:var(--border);"></div>
+              <div style="margin-bottom:12px;position:relative;">
+                <div style="position:absolute;left:-18px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;">✓</div>
+                <div style="font-size:9px;font-weight:600;color:var(--text-primary);">Pesanan Diterima</div>
+                <div style="font-size:7.5px;color:var(--text-secondary);">14 Apr 2024, 10:22</div>
+                <div style="font-size:8px;color:var(--text-secondary);margin-top:1px;">Pesanan Anda telah dikonfirmasi</div>
+              </div>
+              <div style="margin-bottom:12px;position:relative;">
+                <div style="position:absolute;left:-18px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;">✓</div>
+                <div style="font-size:9px;font-weight:600;color:var(--text-primary);">Pembayaran Berhasil</div>
+                <div style="font-size:7.5px;color:var(--text-secondary);">14 Apr 2024, 11:05</div>
+              </div>
+              <div style="margin-bottom:12px;position:relative;">
+                <div style="position:absolute;left:-18px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;">✓</div>
+                <div style="font-size:9px;font-weight:600;color:var(--text-primary);">Sedang Dikemas</div>
+                <div style="font-size:7.5px;color:var(--text-secondary);">14 Apr 2024, 13:30</div>
+              </div>
+              <div style="margin-bottom:12px;position:relative;">
+                <div style="position:absolute;left:-18px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--green-mid);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;">→</div>
+                <div style="font-size:9px;font-weight:600;color:var(--green-mid);">Dalam Pengiriman</div>
+                <div style="font-size:7.5px;color:var(--text-secondary);">15 Apr 2024, 08:00</div>
+                <div style="font-size:8px;color:var(--text-secondary);margin-top:1px;">JNE REG — JD123456789ID</div>
+              </div>
+              <div style="position:relative;">
+                <div style="position:absolute;left:-18px;top:2px;width:12px;height:12px;border-radius:50%;background:#f6faf5;border:1px solid var(--border);"></div>
+                <div style="font-size:9px;font-weight:600;color:var(--text-tertiary);">Pesanan Tiba</div>
+                <div style="font-size:7.5px;color:var(--text-tertiary);">Estimasi 16–17 Apr 2024</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:7px 12px 9px;border-top:1px solid var(--border-soft);flex-shrink:0;">
+            <button class="btn-green">Lacak Paket di JNE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Status Pesanan</div>
+  </div>
+
+  <!-- 15. RIWAYAT PESANAN -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="sc">
+          <div style="padding:8px 12px 6px;font-size:13px;font-weight:700;color:var(--text-primary);flex-shrink:0;">Riwayat Pesanan</div>
+          <div style="display:flex;gap:5px;padding:0 12px 6px;overflow-x:auto;flex-shrink:0;">
+            <div style="font-size:8px;padding:3px 10px;border-radius:10px;background:var(--green-mid);color:#fff;white-space:nowrap;flex-shrink:0;">Semua</div>
+            <div style="font-size:8px;padding:3px 10px;border-radius:10px;background:#f6faf5;color:var(--text-secondary);white-space:nowrap;border:1px solid var(--border);flex-shrink:0;">Dikirim</div>
+            <div style="font-size:8px;padding:3px 10px;border-radius:10px;background:#f6faf5;color:var(--text-secondary);white-space:nowrap;border:1px solid var(--border);flex-shrink:0;">Selesai</div>
+            <div style="font-size:8px;padding:3px 10px;border-radius:10px;background:#f6faf5;color:var(--text-secondary);white-space:nowrap;border:1px solid var(--border);flex-shrink:0;">Dibatalkan</div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:0 12px;">
+            <div style="border:1px solid var(--border);border-radius:11px;padding:9px;margin-bottom:7px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <div style="font-size:8px;color:var(--text-secondary);">#AGM-2024-0892 · 14 Apr 2024</div>
+                <div style="background:var(--green-pale);color:var(--green-dark);font-size:7px;padding:1.5px 7px;border-radius:5px;font-weight:600;">Dikirim</div>
+              </div>
+              <div style="display:flex;gap:7px;align-items:center;margin-bottom:5px;">
+                <div class="img-pest" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">🧴</div>
+                <div><div style="font-size:9px;font-weight:600;">Curacron 500 EC x2</div><div style="font-size:8px;color:var(--text-secondary);">+ 2 produk lainnya</div></div>
+                <div style="margin-left:auto;font-size:10px;font-weight:700;">Rp 335.900</div>
+              </div>
+              <div style="display:flex;gap:4px;">
+                <div style="flex:1;border:1px solid var(--border);border-radius:8px;padding:5px;text-align:center;font-size:8px;color:var(--text-secondary);">Detail</div>
+                <div style="flex:1;background:var(--green-mid);border-radius:8px;padding:5px;text-align:center;font-size:8px;color:#fff;font-weight:600;">Lacak Paket</div>
+              </div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:11px;padding:9px;margin-bottom:7px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <div style="font-size:8px;color:var(--text-secondary);">#AGM-2024-0751 · 2 Apr 2024</div>
+                <div style="background:#e8f5e9;color:#2e7d32;font-size:7px;padding:1.5px 7px;border-radius:5px;font-weight:600;">Selesai</div>
+              </div>
+              <div style="display:flex;gap:7px;align-items:center;margin-bottom:5px;">
+                <div class="img-fert" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">💧</div>
+                <div><div style="font-size:9px;font-weight:600;">Pupuk NPK Mutiara x5</div><div style="font-size:8px;color:var(--text-secondary);">+ 1 produk lainnya</div></div>
+                <div style="margin-left:auto;font-size:10px;font-weight:700;">Rp 197.500</div>
+              </div>
+              <div style="display:flex;gap:4px;">
+                <div style="flex:1;border:1px solid var(--border);border-radius:8px;padding:5px;text-align:center;font-size:8px;color:var(--text-secondary);">Detail</div>
+                <div style="flex:1;background:var(--green-mid);border-radius:8px;padding:5px;text-align:center;font-size:8px;color:#fff;font-weight:600;">Beli Lagi</div>
+              </div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:11px;padding:9px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <div style="font-size:8px;color:var(--text-secondary);">#AGM-2024-0634 · 18 Mar 2024</div>
+                <div style="background:#fce4ec;color:#c62828;font-size:7px;padding:1.5px 7px;border-radius:5px;font-weight:600;">Dibatalkan</div>
+              </div>
+              <div style="display:flex;gap:7px;align-items:center;">
+                <div class="img-herb" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">🌱</div>
+                <div><div style="font-size:9px;font-weight:600;">Gramoxone 500ml x1</div></div>
+                <div style="margin-left:auto;font-size:10px;font-weight:700;">Rp 60.000</div>
+              </div>
+            </div>
+          </div>
+          <div class="nav">
+            <div class="ni"><span class="ni-ic">🏠</span><span>Beranda</span></div>
+            <div class="ni"><span class="ni-ic">❤️</span><span>Favorit</span></div>
+            <div class="ni"><span class="ni-ic">🛒</span><span>Keranjang</span></div>
+            <div class="ni a"><span class="ni-ic">👤</span><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Riwayat Pesanan</div>
+  </div>
+
+  <!-- 16. PROFIL PENGGUNA -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="sb" style="background:var(--green-mid);"><span style="color:rgba(255,255,255,0.8);">9:41</span><span style="color:rgba(255,255,255,0.8);">●●●</span></div>
+        <div class="sc" style="overflow-y:auto;">
+          <div style="background:linear-gradient(135deg,var(--green-dark),var(--green-mid));padding:10px 14px 18px;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">👤</div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#fff;">Budi Santoso</div>
+                <div style="font-size:8px;color:rgba(255,255,255,0.75);">budi@email.com</div>
+                <div style="font-size:7.5px;color:rgba(255,255,255,0.6);margin-top:2px;">Member sejak Januari 2024</div>
+              </div>
+              <div style="margin-left:auto;background:rgba(255,255,255,0.18);padding:3px 9px;border-radius:7px;font-size:8px;color:#fff;font-weight:600;">Edit</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:10px;">
+              <div style="background:rgba(255,255,255,0.14);border-radius:9px;padding:6px;text-align:center;">
+                <div style="font-size:14px;font-weight:700;color:#fff;">12</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.75);">Pesanan</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.14);border-radius:9px;padding:6px;text-align:center;">
+                <div style="font-size:14px;font-weight:700;color:#fff;">8</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.75);">Favorit</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.14);border-radius:9px;padding:6px;text-align:center;">
+                <div style="font-size:14px;font-weight:700;color:#fff;">1.240</div>
+                <div style="font-size:7px;color:rgba(255,255,255,0.75);">Poin</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:8px 12px;flex:1;">
+            <div style="background:#f6faf5;border-radius:11px;overflow:hidden;margin-bottom:8px;">
+              <div style="padding:5px 10px;font-size:8px;font-weight:700;color:var(--text-secondary);border-bottom:1px solid var(--border-soft);">Akun Saya</div>
+              <div style="display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border-soft);"><span style="font-size:14px;width:22px;">📋</span><span style="font-size:9px;color:var(--text-primary);flex:1;">Riwayat Pesanan</span><span style="font-size:9px;color:var(--text-tertiary);">›</span></div>
+              <div style="display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border-soft);"><span style="font-size:14px;width:22px;">📍</span><span style="font-size:9px;color:var(--text-primary);flex:1;">Daftar Alamat</span><span style="font-size:9px;color:var(--text-tertiary);">›</span></div>
+              <div style="display:flex;align-items:center;padding:8px 10px;"><span style="font-size:14px;width:22px;">🏆</span><span style="font-size:9px;color:var(--text-primary);flex:1;">Poin & Reward</span><span style="background:var(--green-pale);color:var(--green-dark);font-size:7px;padding:1px 5px;border-radius:4px;margin-right:4px;">1.240 pts</span><span style="font-size:9px;color:var(--text-tertiary);">›</span></div>
+            </div>
+            <div style="background:#f6faf5;border-radius:11px;overflow:hidden;margin-bottom:8px;">
+              <div style="padding:5px 10px;font-size:8px;font-weight:700;color:var(--text-secondary);border-bottom:1px solid var(--border-soft);">Lainnya</div>
+              <div style="display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border-soft);"><span style="font-size:14px;width:22px;">🔔</span><span style="font-size:9px;color:var(--text-primary);flex:1;">Notifikasi</span><span style="font-size:9px;color:var(--text-tertiary);">›</span></div>
+              <div style="display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border-soft);"><span style="font-size:14px;width:22px;">🔒</span><span style="font-size:9px;color:var(--text-primary);flex:1;">Keamanan & Privasi</span><span style="font-size:9px;color:var(--text-tertiary);">›</span></div>
+              <div style="display:flex;align-items:center;padding:8px 10px;"><span style="font-size:14px;width:22px;">❓</span><span style="font-size:9px;color:var(--text-primary);flex:1;">Bantuan & FAQ</span><span style="font-size:9px;color:var(--text-tertiary);">›</span></div>
+            </div>
+            <div style="border:1px solid #f09595;border-radius:11px;padding:9px 10px;display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+              <span style="font-size:14px;">🚪</span><span style="font-size:9px;color:#a32d2d;font-weight:600;">Keluar dari Akun</span>
+            </div>
+          </div>
+          <div class="nav">
+            <div class="ni"><span class="ni-ic">🏠</span><span>Beranda</span></div>
+            <div class="ni"><span class="ni-ic">❤️</span><span>Favorit</span></div>
+            <div class="ni"><span class="ni-ic">🛒</span><span>Keranjang</span></div>
+            <div class="ni a"><span class="ni-ic">👤</span><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-badge">Profil Pengguna</div>
+  </div>
+
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="app-footer">
+  AgroMed — Aplikasi E-Catalog Produk Obat Pertanian &nbsp;|&nbsp; 16 Screens Total &nbsp;|&nbsp; © 2024
+</footer>
+
+</body>
+</html>
