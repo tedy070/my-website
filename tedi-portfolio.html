@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tedi Zakaria Perdana | UI/UX Designer & Web Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0a;
+  --bg2:#111114;
+  --bg3:#16161a;
+  --text:#ffffff;
+  --text2:#a0a0a8;
+  --text3:#6b6b74;
+  --teal:#4fc3a1;
+  --teal2:#3da88a;
+  --purple:#7c6af7;
+  --pink:#ff4b7c;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --card:#13131a;
+  --font:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--teal);border-radius:2px;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;height:70px;
+  background:rgba(10,10,10,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  transition:all .3s;
+}
+nav.scrolled{background:rgba(10,10,10,0.97);}
+.nav-logo{
+  font-size:22px;font-weight:800;color:var(--text);
+  letter-spacing:-0.5px;
+}
+.nav-logo span{color:var(--teal);}
+.nav-links{display:flex;align-items:center;gap:36px;}
+.nav-links a{
+  font-size:14px;font-weight:500;color:var(--text2);
+  text-decoration:none;transition:color .2s;position:relative;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-links a.active::after{
+  content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--teal);
+}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-divider{width:1px;height:20px;background:var(--border2);}
+.nav-lang{
+  display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;
+  color:var(--text2);cursor:pointer;
+}
+.nav-lang svg{width:14px;height:14px;opacity:.7;}
+
+/* ── HERO ── */
+#beranda{
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:70px 60px 0;
+  position:relative;
+  overflow:hidden;
+}
+.hero-glow-left{
+  position:absolute;top:0;left:-200px;
+  width:600px;height:600px;
+  background:radial-gradient(ellipse,rgba(0,80,60,0.35) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-glow-right{
+  position:absolute;bottom:0;right:-100px;
+  width:500px;height:500px;
+  background:radial-gradient(ellipse,rgba(80,0,80,0.3) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:1200px;margin:0 auto;gap:40px;
+  position:relative;z-index:1;
+}
+.hero-left{flex:1;}
+.hero-sup{
+  font-size:13px;font-weight:500;color:var(--text2);
+  letter-spacing:2px;margin-bottom:14px;
+}
+.hero-name{
+  font-size:54px;font-weight:800;line-height:1.05;
+  letter-spacing:-1.5px;margin-bottom:10px;
+}
+.hero-role{
+  font-size:22px;font-weight:700;margin-bottom:20px;
+}
+.hero-role span.label{
+  color:var(--text2);font-weight:500;margin-right:6px;font-size:18px;
+}
+.hero-role .underline{
+  position:relative;
+}
+.hero-role .underline::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:2px;background:var(--text);
+}
+.hero-socials{display:flex;gap:16px;margin-bottom:22px;}
+.hero-social{
+  width:38px;height:38px;border-radius:8px;
+  background:rgba(255,255,255,0.07);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;text-decoration:none;color:var(--text2);
+}
+.hero-social:hover{background:rgba(255,255,255,0.14);color:var(--text);}
+.hero-social svg{width:17px;height:17px;}
+.hero-desc{
+  font-size:15px;color:var(--text2);line-height:1.7;
+  max-width:480px;margin-bottom:32px;
+}
+.hero-desc span.cursor{
+  display:inline-block;width:2px;height:1em;background:var(--text);
+  vertical-align:text-bottom;animation:blink 1s step-end infinite;
+}
+@keyframes blink{50%{opacity:0;}}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;border-radius:100px;
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+  color:var(--text);font-size:14px;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all .2s;
+  backdrop-filter:blur(4px);
+}
+.btn-primary:hover{background:rgba(255,255,255,0.2);}
+.btn-primary svg{width:14px;height:14px;}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;border-radius:100px;
+  background:transparent;border:1px solid rgba(255,255,255,0.22);
+  color:var(--text2);font-size:14px;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all .2s;
+}
+.btn-outline:hover{border-color:rgba(255,255,255,0.5);color:var(--text);}
+
+/* ── HERO CARD ── */
+.hero-right{flex:0 0 360px;}
+.hero-card{
+  position:relative;border-radius:20px;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.1);
+  background:#1a1a20;
+}
+.hero-card-img{
+  width:100%;height:460px;object-fit:cover;display:block;
+}
+.hero-card-img-placeholder{
+  width:100%;height:460px;
+  background:linear-gradient(135deg,#1e2a22 0%,#111420 50%,#1e1a2a 100%);
+  display:flex;align-items:center;justify-content:center;position:relative;
+  overflow:hidden;
+}
+.hero-card-img-placeholder::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-card-person{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+}
+.hero-card-avatar{
+  width:120px;height:120px;border-radius:50%;
+  background:linear-gradient(135deg,#2d3a2d,#1e252e);
+  border:2px solid rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:40px;
+}
+.hero-card-name-overlay{
+  position:absolute;top:20px;left:20px;right:20px;
+  font-size:22px;font-weight:700;color:rgba(255,255,255,0.85);
+  text-shadow:0 2px 20px rgba(0,0,0,0.8);
+}
+.hero-card-bottom{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 100%);
+  padding:20px;display:flex;align-items:center;justify-content:space-between;
+}
+.hero-card-user{display:flex;align-items:center;gap:10px;}
+.hero-card-avatar-sm{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,#4fc3a1,#3d8a7c);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.hero-card-username{font-size:13px;font-weight:600;color:#fff;}
+.hero-card-status{
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;
+}
+.hero-card-status::before{
+  content:'';width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0;
+}
+.hero-card-contact{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);
+  cursor:pointer;
+}
+
+/* ── SECTION SHARED ── */
+section{padding:100px 60px;}
+.section-inner{max-width:1200px;margin:0 auto;}
+
+/* ── TENTANG ── */
+#tentang{background:var(--bg2);}
+.about-box{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:60px 70px;
+  max-width:900px;margin:0 auto;
+}
+.about-title{
+  font-size:40px;font-weight:800;margin-bottom:20px;
+  letter-spacing:-1px;
+}
+.about-title .accent{color:var(--purple);}
+.about-quote{
+  border-left:3px solid var(--border2);
+  padding-left:16px;
+  font-style:italic;font-size:15px;color:var(--text2);
+  margin-bottom:28px;
+}
+.about-sep{
+  height:1px;background:var(--border);margin:28px 0;
+}
+.about-body p{
+  font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:16px;
+}
+.about-body p:last-child{margin-bottom:0;}
+.about-stats{
+  display:flex;gap:0;
+  border-top:1px solid var(--border);
+  margin-top:40px;
+  padding-top:40px;
+}
+.about-stat{
+  flex:1;padding-right:32px;
+}
+.about-stat:not(:last-child){
+  border-right:1px solid var(--border);
+  margin-right:32px;
+}
+.about-stat-num{
+  font-size:48px;font-weight:800;color:var(--purple);
+  letter-spacing:-2px;line-height:1;margin-bottom:8px;
+}
+.about-stat-label{
+  font-size:11px;font-weight:600;color:var(--text3);
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+.about-cv-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:40px;
+  padding:14px 28px;border-radius:100px;
+  background:rgba(79,195,161,0.15);
+  border:1px solid rgba(79,195,161,0.3);
+  color:var(--teal);font-size:14px;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all .2s;
+}
+.about-cv-btn:hover{background:rgba(79,195,161,0.25);}
+.about-cv-btn svg{width:16px;height:16px;}
+
+/* ── PROYEK ── */
+#proyek{background:var(--bg);}
+.proyek-header{text-align:center;margin-bottom:50px;}
+.proyek-title{
+  font-size:42px;font-weight:800;letter-spacing:-1px;margin-bottom:12px;
+}
+.proyek-title .accent{color:var(--teal);}
+.proyek-sub{font-size:15px;color:var(--text2);}
+
+.proyek-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:16px;
+}
+.proj-card{
+  border-radius:16px;overflow:hidden;position:relative;
+  background:var(--card);border:1px solid var(--border);
+  cursor:pointer;transition:transform .3s,border-color .3s;
+}
+.proj-card:hover{transform:translateY(-4px);border-color:var(--border2);}
+
+/* Big card — spans rows */
+.proj-card.big{grid-row:span 2;grid-column:1;}
+
+.proj-img{
+  width:100%;height:100%;min-height:220px;
+  object-fit:cover;display:block;
+}
+.proj-img-placeholder{
+  width:100%;
+  display:flex;align-items:center;justify-content:center;
+}
+.proj-card.big .proj-img-placeholder{height:100%;min-height:500px;}
+.proj-card:not(.big) .proj-img-placeholder{height:220px;}
+
+/* Big card image - coffee shop style */
+.proj-img-coffee{
+  background:linear-gradient(145deg,#1a1208 0%,#2a1e0a 30%,#1c2416 60%,#0d1a10 100%);
+}
+.proj-img-coffee::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 30%,rgba(180,120,50,0.3) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 60% at 70% 70%,rgba(50,100,50,0.2) 0%,transparent 70%);
+}
+
+/* Small cards */
+.proj-img-dark{background:linear-gradient(145deg,#111118,#1a1a24);}
+.proj-img-darker{background:linear-gradient(145deg,#0d0d12,#141420);}
+
+.proj-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.9) 0%,rgba(0,0,0,0.1) 50%,transparent 100%);
+}
+.proj-content{
+  position:absolute;bottom:0;left:0;right:0;padding:24px;
+}
+.proj-name{
+  font-size:18px;font-weight:700;color:#fff;margin-bottom:8px;
+}
+.proj-desc{
+  font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;margin-bottom:12px;
+}
+.proj-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.proj-tag{
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;
+  border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.85);
+  background:rgba(255,255,255,0.08);
+}
+.proj-tag.teal{border-color:rgba(79,195,161,0.5);color:var(--teal);background:rgba(79,195,161,0.1);}
+.proj-tag.fire{border-color:rgba(255,100,50,0.5);color:#ff7043;background:rgba(255,100,50,0.1);}
+.proj-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:#fff;text-decoration:none;
+}
+.proj-link svg{width:14px;height:14px;}
+
+/* Grayscale for smaller cards */
+.proj-card:not(.big) .proj-img-placeholder{filter:grayscale(100%);}
+
+/* small card inner decorations */
+.proj-small-content{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.proj-analytics{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;opacity:.6;
+}
+.proj-bar{height:4px;background:rgba(255,255,255,0.3);border-radius:2px;margin-bottom:4px;}
+.proj-bar-fill{height:100%;background:rgba(255,255,255,0.6);border-radius:2px;}
+.proj-chart-lines{width:100%;padding:10px;}
+.proj-chart-line{height:1px;background:rgba(255,255,255,0.15);margin-bottom:8px;position:relative;}
+.proj-chart-dot{
+  position:absolute;right:20%;top:-3px;
+  width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);
+}
+
+/* ── KONTAK ── */
+#kontak{background:var(--bg2);padding:80px 60px 120px;}
+.kontak-header{text-align:center;margin-bottom:50px;}
+.kontak-title{
+  font-size:42px;font-weight:800;letter-spacing:-1px;margin-bottom:14px;
+}
+.kontak-title .accent{color:var(--teal);}
+.kontak-sub{font-size:15px;color:var(--text2);max-width:600px;margin:0 auto;}
+
+.kontak-box{
+  max-width:900px;margin:0 auto;
+  background:var(--card);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  overflow:hidden;display:grid;grid-template-columns:1fr 1.4fr;
+}
+
+/* Left panel */
+.kontak-left{
+  padding:40px 36px;
+  border-right:1px solid var(--border);
+}
+.kontak-status{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;color:#ff4b4b;
+  letter-spacing:1.5px;margin-bottom:32px;
+}
+.kontak-status-dot{
+  width:8px;height:8px;border-radius:50%;background:#ff4b4b;
+  animation:pulse-red 2s ease-in-out infinite;
+}
+@keyframes pulse-red{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,75,75,0.4);}
+  50%{box-shadow:0 0 0 6px rgba(255,75,75,0);}
+}
+.kontak-info-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:18px 20px;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:background .2s;
+  text-decoration:none;
+}
+.kontak-info-card:hover{background:rgba(255,255,255,0.08);}
+.kontak-info-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.kontak-info-icon svg{width:16px;height:16px;color:var(--text2);}
+.kontak-info-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.kontak-info-val{font-size:13px;font-weight:500;color:var(--text);}
+
+/* Right panel — form */
+.kontak-right{padding:40px 36px;}
+.kontak-form-title{
+  font-size:12px;font-weight:700;color:var(--text2);
+  letter-spacing:1.5px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:28px;
+}
+.kontak-form-title svg{width:16px;height:16px;color:var(--teal);}
+.form-field{margin-bottom:20px;}
+.form-input{
+  width:100%;background:transparent;border:none;
+  border-bottom:1px solid var(--border2);
+  padding:10px 0 10px 28px;
+  font-size:14px;color:var(--text);font-family:var(--font);
+  outline:none;transition:border-color .2s;position:relative;
+}
+.form-input::placeholder{color:var(--text3);}
+.form-input:focus{border-bottom-color:rgba(255,255,255,0.4);}
+.form-field-wrap{position:relative;}
+.form-field-icon{
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;color:var(--text3);
+}
+.form-field-wrap.textarea-wrap .form-field-icon{top:12px;transform:none;}
+.form-textarea{
+  width:100%;background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);border-radius:12px;
+  padding:14px 14px;
+  font-size:14px;color:var(--text);font-family:var(--font);
+  outline:none;transition:border-color .2s;resize:none;height:120px;
+  margin-top:4px;
+}
+.form-textarea::placeholder{color:var(--text3);}
+.form-textarea:focus{border-color:rgba(255,255,255,0.3);}
+.btn-submit{
+  width:100%;padding:16px;border-radius:12px;
+  background:linear-gradient(135deg,#ff4b7c,#ff2d6a);
+  border:none;color:#fff;
+  font-size:13px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:8px;
+}
+.btn-submit:hover{background:linear-gradient(135deg,#ff6090,#ff4070);transform:translateY(-1px);}
+.btn-submit svg{width:16px;height:16px;}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  padding:30px 60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.footer-logo{font-size:17px;font-weight:800;}
+.footer-logo span{color:var(--teal);}
+.footer-copy{font-size:13px;color:var(--text3);}
+
+
+/* ── LIGHT MODE ── */
+body.light-mode{
+  --bg:#f5f5f7;
+  --bg2:#ebebef;
+  --bg3:#e0e0e8;
+  --text:#0a0a14;
+  --text2:#555566;
+  --text3:#8888a0;
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.14);
+  --card:#ffffff;
+}
+body.light-mode nav{
+  background:rgba(245,245,247,0.88);
+}
+body.light-mode nav.scrolled{
+  background:rgba(245,245,247,0.97);
+}
+body.light-mode .hero-card{
+  background:#e8e8f0;
+}
+body.light-mode .hero-card-img-placeholder{
+  background:linear-gradient(135deg,#c8d8c8 0%,#b0b8d0 50%,#c0b8d8 100%) !important;
+}
+body.light-mode .about-box{
+  background:#fff;
+  box-shadow:0 4px 40px rgba(0,0,0,0.06);
+}
+body.light-mode .kontak-box{
+  background:#fff;
+}
+body.light-mode .hero-card-img-real{
+  filter:none;
+}
+body.light-mode .form-input{
+  color:var(--text);
+  border-bottom-color:rgba(0,0,0,0.18);
+}
+body.light-mode .form-textarea{
+  color:var(--text);
+  background:rgba(0,0,0,0.04);
+}
+body.light-mode footer{
+  background:var(--bg2);
+}
+
+/* ── NAV CONTROLS ── */
+.nav-controls{
+  display:flex;align-items:center;gap:10px;
+}
+.nav-mode-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:100px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid var(--border2);
+  color:var(--text2);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+  font-family:var(--font);
+}
+.nav-mode-btn:hover{background:rgba(255,255,255,0.14);color:var(--text);}
+.nav-mode-btn svg{width:14px;height:14px;flex-shrink:0;}
+.nav-lang-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:100px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid var(--border2);
+  color:var(--text2);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+  font-family:var(--font);
+}
+.nav-lang-btn:hover{background:rgba(255,255,255,0.14);color:var(--text);}
+.nav-lang-btn svg{width:14px;height:14px;flex-shrink:0;}
+.nav-lang-btn.active-lang{
+  background:rgba(79,195,161,0.15);
+  border-color:rgba(79,195,161,0.4);
+  color:var(--teal);
+}
+
+/* Light mode btn adjustments */
+body.light-mode .nav-mode-btn,
+body.light-mode .nav-lang-btn{
+  background:rgba(0,0,0,0.05);
+  border-color:rgba(0,0,0,0.12);
+}
+body.light-mode .nav-mode-btn:hover,
+body.light-mode .nav-lang-btn:hover{
+  background:rgba(0,0,0,0.1);
+}
+
+/* ── SCROLL TO TOP ── */
+.scroll-top{
+  position:fixed;bottom:30px;right:30px;z-index:99;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--teal);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .3s;opacity:0;transform:translateY(20px);
+  box-shadow:0 4px 20px rgba(79,195,161,0.4);
+}
+.scroll-top.visible{opacity:1;transform:translateY(0);}
+.scroll-top:hover{background:var(--teal2);}
+.scroll-top svg{width:18px;height:18px;color:#fff;}
+
+/* ── ANIMATIONS ── */
+.fade-in{
+  opacity:0;transform:translateY(24px);
+  transition:opacity .7s ease, transform .7s ease;
+}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+.fade-in-delay-1{transition-delay:.1s;}
+.fade-in-delay-2{transition-delay:.2s;}
+.fade-in-delay-3{transition-delay:.3s;}
+.fade-in-delay-4{transition-delay:.4s;}
+.fade-in-delay-5{transition-delay:.5s;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:0 24px;}
+  #beranda{padding:70px 24px 0;}
+  .hero-inner{flex-direction:column;}
+  .hero-right{flex:0 0 auto;width:100%;}
+  section{padding:70px 24px;}
+  .about-box{padding:36px 24px;}
+  .proyek-grid{grid-template-columns:1fr;grid-template-rows:auto;}
+  .proj-card.big{grid-row:auto;grid-column:auto;}
+  .proj-card.big .proj-img-placeholder{min-height:320px;}
+  .kontak-box{grid-template-columns:1fr;}
+  .kontak-left{border-right:none;border-bottom:1px solid var(--border);}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-logo">Tedi<span>.</span></div>
+  <div class="nav-links">
+    <a href="#beranda" class="active" data-id="Beranda" data-en="Home">Beranda</a>
+    <a href="#tentang" data-id="Tentang" data-en="About">Tentang</a>
+    <a href="#proyek" data-id="Proyek" data-en="Projects">Proyek</a>
+    <a href="#kontak" data-id="Kontak" data-en="Contact">Kontak</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-controls">
+      <button class="nav-mode-btn" id="mode-btn" onclick="toggleMode()" title="Ganti Mode">
+        <svg id="mode-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="mode-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <span id="mode-label">Gelap</span>
+      </button>
+      <button class="nav-lang-btn active-lang" id="lang-id-btn" onclick="setLang('id')" title="Bahasa Indonesia">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        ID
+      </button>
+      <button class="nav-lang-btn" id="lang-en-btn" onclick="setLang('en')" title="English">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        EN
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="beranda">
+  <div class="hero-glow-left"></div>
+  <div class="hero-glow-right"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-sup fade-in" data-id="HALO, SAYA" data-en="HELLO, I'M">HALO, SAYA</div>
+      <h1 class="hero-name fade-in fade-in-delay-1" id="hero-name">Tedi Zakaria<br>Perdana</h1>
+      <div class="hero-role fade-in fade-in-delay-2">
+        <span class="label" data-id="Seorang" data-en="A">Seorang</span>
+        <span class="underline">UI/UX Designer &amp; Web Developer</span>
+      </div>
+      <div class="hero-socials fade-in fade-in-delay-3">
+        <a href="#" class="hero-social" title="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        </a>
+        <a href="#" class="hero-social" title="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zm2-3a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+        </a>
+        <a href="#" class="hero-social" title="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="#" class="hero-social" title="TikTok">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.22 6.22 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.2a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.87a8.21 8.21 0 0 0 4.8 1.54V7c-.1 0-1.1-.04-1.04-.31z"/></svg>
+        </a>
+      </div>
+      <p class="hero-desc fade-in fade-in-delay-3">
+        <span data-id="Saya membantu bisnis dan individu mengubah ide menjadi solusi digital yang indah dan fungsional." data-en="I help businesses and individuals turn ideas into beautiful, functional digital solutions.">Saya membantu bisnis dan individu mengubah ide menjadi solusi digital yang indah dan fungsional.</span><span class="cursor"></span>
+      </p>
+      <div class="hero-btns fade-in fade-in-delay-4">
+        <a href="#proyek" class="btn-primary">
+          Lihat Proyek
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+        <a href="#kontak" class="btn-outline" data-id="Kontak Saya" data-en="Contact Me">Kontak Saya</a>
+      </div>
+    </div>
+
+    <div class="hero-right fade-in fade-in-delay-2">
+      <div class="hero-card">
+        <div class="hero-card-img-placeholder proj-img-coffee" style="height:460px;">
+          <!-- Decorative elements to simulate photo feel -->
+          <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(40,60,35,0.6) 0%,rgba(15,20,15,0.9) 100%);"></div>
+          <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;opacity:.15;">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            </div>
+          </div>
+          <!-- Warm light effect -->
+          <div style="position:absolute;top:30%;left:20%;width:200px;height:200px;background:radial-gradient(ellipse,rgba(220,150,60,0.25) 0%,transparent 70%);"></div>
+          <!-- Dark figure silhouette feel -->
+          <div style="position:absolute;bottom:80px;left:50%;transform:translateX(-50%);width:120px;height:200px;background:rgba(0,0,0,0.4);border-radius:60px 60px 0 0;filter:blur(2px);"></div>
+          <!-- Doorframe effect -->
+          <div style="position:absolute;top:0;left:60px;width:4px;height:100%;background:rgba(255,255,255,0.05);"></div>
+          <div style="position:absolute;top:0;right:60px;width:4px;height:100%;background:rgba(255,255,255,0.05);"></div>
+        </div>
+        <div class="hero-card-name-overlay">Tedi Zakaria Perdana</div>
+        <div class="hero-card-bottom">
+          <div class="hero-card-user">
+            <div class="hero-card-avatar-sm">T</div>
+            <div>
+              <div class="hero-card-username">@tedizakaria</div>
+              <div class="hero-card-status">Online</div>
+            </div>
+          </div>
+          <div class="hero-card-contact">Contact Me</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TENTANG -->
+<section id="tentang">
+  <div class="section-inner">
+    <div class="about-box fade-in">
+      <h2 class="about-title"><span data-id="Tentang" data-en="About">Tentang</span> <span class="accent" data-id="Saya" data-en="Me">Saya</span></h2>
+      <div class="about-quote" data-id="Perpaduan logika kode dan estetika desain." data-en="Where code logic meets design aesthetics.">Perpaduan logika kode dan estetika desain.</div>
+      <div class="about-sep"></div>
+      <div class="about-body">
+        <p data-id="Perjalanan saya di dunia digital dimulai sejak bangku SMK. Sebagai seorang pembelajaran otodidak, saya terbiasa memecahkan masalah secara mandiri. Bagi saya, coding adalah seni menyusun logika yang hidup." data-en="My journey in the digital world began during high school. As a self-taught learner, I'm used to solving problems independently. For me, coding is the art of composing living logic.">Perjalanan saya di dunia digital dimulai sejak bangku SMK. Sebagai seorang pembelajaran otodidak, saya terbiasa memecahkan masalah secara mandiri. Bagi saya, coding adalah seni menyusun logika yang hidup.</p>
+        <p data-id="Saat ini, saya menempuh pendidikan di Brebes. Kombinasi kemampuan desain dan pemrograman adalah kekuatan utama saya dalam setiap proyek." data-en="Currently based in Brebes, I combine design skills and programming knowledge as my core strengths in every project.">Saat ini, saya menempuh pendidikan di Brebes. Kombinasi kemampuan desain dan pemrograman adalah kekuatan utama saya dalam setiap proyek.</p>
+      </div>
+      <div class="about-stats">
+        <div class="about-stat">
+          <div class="about-stat-num">3+</div>
+          <div class="about-stat-label" data-id="Tahun Pengalaman" data-en="Years Experience">Tahun Pengalaman</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-num">20+</div>
+          <div class="about-stat-label" data-id="Proyek Selesai" data-en="Projects Done">Proyek Selesai</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-num">10+</div>
+          <div class="about-stat-label" data-id="Klien Puas" data-en="Happy Clients">Klien Puas</div>
+        </div>
+      </div>
+      <a href="#" class="about-cv-btn">
+        <span data-id="Unduh CV" data-en="Download CV">Unduh CV</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PROYEK -->
+<section id="proyek">
+  <div class="section-inner">
+    <div class="proyek-header fade-in">
+      <h2 class="proyek-title"><span data-id="Proyek" data-en="Selected">Proyek</span> <span class="accent" data-id="Terpilih" data-en="Projects">Terpilih</span></h2>
+      <p class="proyek-sub" data-id="Beberapa karya yang menyoroti keahlian saya." data-en="A few works that highlight my expertise.">Beberapa karya yang menyoroti keahlian saya.</p>
+    </div>
+    <div class="proyek-grid fade-in fade-in-delay-1">
+      <!-- Big card -->
+      <div class="proj-card big">
+        <div class="proj-img-placeholder proj-img-coffee" style="height:100%;min-height:500px;position:relative;">
+          <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(30,50,25,0.5) 0%,rgba(10,15,8,0.85) 100%);"></div>
+          <!-- Coffee/plant visual decorations -->
+          <div style="position:absolute;top:20%;right:20%;width:120px;height:120px;border-radius:50%;background:radial-gradient(ellipse,rgba(160,100,40,0.4) 0%,rgba(80,50,15,0.3) 50%,transparent 70%);filter:blur(8px);"></div>
+          <div style="position:absolute;top:10%;left:30%;width:80px;height:120px;background:rgba(40,80,30,0.3);border-radius:40% 40% 0 0;filter:blur(4px);"></div>
+          <div style="position:absolute;bottom:30%;left:15%;width:60px;height:80px;background:rgba(30,70,25,0.25);border-radius:30px;filter:blur(6px);transform:rotate(-15deg);"></div>
+          <!-- Latte art circle -->
+          <div style="position:absolute;top:25%;right:25%;width:90px;height:90px;border-radius:50%;background:rgba(180,120,50,0.35);filter:blur(12px);"></div>
+          <div style="position:absolute;top:30%;right:30%;width:50px;height:50px;border-radius:50%;background:rgba(240,200,120,0.2);filter:blur(6px);"></div>
+        </div>
+        <div class="proj-overlay"></div>
+        <div class="proj-content">
+          <div class="proj-name">Situs E-commerce Kopi</div>
+          <div class="proj-desc">Toko online responsif dengan integrasi pembayaran gateway dan dashboard admin.</div>
+          <div class="proj-tags">
+            <span class="proj-tag teal">Vue.js</span>
+            <span class="proj-tag fire">Firebase</span>
+          </div>
+          <a href="#" class="proj-link">
+            Lihat
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Top right card -->
+      <div class="proj-card">
+        <div class="proj-img-placeholder proj-img-dark" style="height:220px;position:relative;filter:grayscale(100%);">
+          <div style="position:absolute;inset:0;background:linear-gradient(145deg,#1a1a24,#0d0d14);"></div>
+          <!-- Laptop/dashboard visual -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="width:140px;height:90px;background:rgba(255,255,255,0.06);border-radius:6px;border:1px solid rgba(255,255,255,0.08);padding:8px;">
+              <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:2px;margin-bottom:6px;"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                <div style="height:40px;background:rgba(255,255,255,0.06);border-radius:3px;"></div>
+                <div style="height:40px;background:rgba(255,255,255,0.04);border-radius:3px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-overlay"></div>
+        <div class="proj-content" style="padding:16px;">
+          <div class="proj-name" style="font-size:15px;">Dashboard Analytics</div>
+          <div class="proj-tags" style="margin-bottom:0;">
+            <span class="proj-tag">React</span>
+            <span class="proj-tag">Chart.js</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom right top card -->
+      <div class="proj-card">
+        <div class="proj-img-placeholder proj-img-dark" style="height:220px;position:relative;filter:grayscale(100%);">
+          <div style="position:absolute;inset:0;background:linear-gradient(145deg,#111118,#0a0a10);"></div>
+          <!-- Dark scene / silhouette -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <div style="text-align:center;">
+              <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;">
+                <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
+              </div>
+              <div style="width:60px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin:0 auto;"></div>
+            </div>
+          </div>
+          <!-- Atmospheric light -->
+          <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:100px;height:60px;background:radial-gradient(ellipse,rgba(255,255,255,0.04) 0%,transparent 70%);"></div>
+        </div>
+        <div class="proj-overlay"></div>
+        <div class="proj-content" style="padding:16px;">
+          <div class="proj-name" style="font-size:15px;">Platform Streaming</div>
+          <div class="proj-tags" style="margin-bottom:0;">
+            <span class="proj-tag">Next.js</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Far right tall card -->
+      <div class="proj-card" style="grid-row:span 2;">
+        <div class="proj-img-placeholder proj-img-darker" style="height:100%;min-height:460px;position:relative;filter:grayscale(100%);">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,#0d0d12 0%,#050508 100%);"></div>
+          <!-- Graph/chart visual -->
+          <div style="position:absolute;inset:16px;display:flex;flex-direction:column;justify-content:center;gap:6px;opacity:.5;">
+            <div style="height:2px;background:rgba(255,255,255,0.15);border-radius:1px;"></div>
+            <div style="height:2px;background:rgba(255,255,255,0.1);border-radius:1px;"></div>
+            <div style="height:2px;background:rgba(255,255,255,0.15);border-radius:1px;"></div>
+            <div style="height:2px;background:rgba(255,255,255,0.08);border-radius:1px;"></div>
+            <div style="height:2px;background:rgba(255,255,255,0.12);border-radius:1px;"></div>
+            <!-- Bar chart -->
+            <div style="display:flex;align-items:flex-end;gap:3px;height:60px;margin-top:8px;">
+              <div style="flex:1;background:rgba(255,255,255,0.15);height:40%;border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;background:rgba(255,255,255,0.2);height:70%;border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;background:rgba(255,255,255,0.12);height:55%;border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;background:rgba(255,255,255,0.25);height:90%;border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;background:rgba(255,255,255,0.18);height:65%;border-radius:2px 2px 0 0;"></div>
+              <div style="flex:1;background:rgba(255,255,255,0.3);height:100%;border-radius:2px 2px 0 0;"></div>
+            </div>
+            <!-- Stats rows -->
+            <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.3);">
+              <span>40.1%</span><span>4718</span><span>13min</span>
+            </div>
+            <!-- Waveform -->
+            <div style="margin-top:8px;height:30px;display:flex;align-items:center;gap:1px;overflow:hidden;">
+              <div style="flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:1px;"></div>
+              <div style="flex:1;height:14px;background:rgba(255,255,255,0.12);border-radius:1px;"></div>
+              <div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:1px;"></div>
+              <div style="flex:1;height:18px;background:rgba(255,255,255,0.15);border-radius:1px;"></div>
+              <div style="flex:1;height:10px;background:rgba(255,255,255,0.1);border-radius:1px;"></div>
+              <div style="flex:1;height:22px;background:rgba(255,255,255,0.18);border-radius:1px;"></div>
+              <div style="flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:1px;"></div>
+              <div style="flex:1;height:16px;background:rgba(255,255,255,0.13);border-radius:1px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="proj-overlay"></div>
+        <div class="proj-content" style="padding:16px;">
+          <div class="proj-name" style="font-size:15px;">Data Visualization</div>
+          <div class="proj-tags" style="margin-bottom:0;">
+            <span class="proj-tag">D3.js</span>
+            <span class="proj-tag">Python</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KONTAK -->
+<section id="kontak">
+  <div class="section-inner">
+    <div class="kontak-header fade-in">
+      <h2 class="kontak-title"><span data-id="Mari" data-en="Let's">Mari</span> <span class="accent" data-id="Terhubung" data-en="Connect">Terhubung</span></h2>
+      <p class="kontak-sub" data-id="Saya selalu terbuka untuk proyek baru atau sekadar obrolan. Kirimkan sinyal Anda." data-en="I'm always open to new projects or just a chat. Send your signal.">Saya selalu terbuka untuk proyek baru atau sekadar obrolan. Kirimkan sinyal Anda.</p>
+    </div>
+    <div class="kontak-box fade-in fade-in-delay-1">
+      <!-- Left -->
+      <div class="kontak-left">
+        <div class="kontak-status">
+          <div class="kontak-status-dot"></div>
+          SYSTEM STATUS: ONLINE
+        </div>
+        <a href="mailto:hafidzhpb2005@gmail.com" class="kontak-info-card">
+          <div class="kontak-info-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="kontak-info-label" data-id="Email Saya" data-en="Email Me">Email Saya</div>
+            <div class="kontak-info-val">tedizakaria@email.com</div>
+          </div>
+        </a>
+        <a href="https://wa.me/6283189264857" class="kontak-info-card">
+          <div class="kontak-info-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="kontak-info-label" data-id="Chat WhatsApp" data-en="Chat WhatsApp">Chat WhatsApp</div>
+            <div class="kontak-info-val">+62 xxx-xxxx-xxxx</div>
+          </div>
+        </a>
+      </div>
+      <!-- Right -->
+      <div class="kontak-right">
+        <div class="kontak-form-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span data-id="MULAI TRANSMISI DATA" data-en="INITIATE DATA TRANSMISSION">MULAI TRANSMISI DATA</span>
+        </div>
+        <form onsubmit="handleSubmit(event)">
+          <div class="form-field">
+            <div class="form-field-wrap">
+              <svg class="form-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" class="form-input" placeholder="ID Pengirim / Nama" data-id-ph="ID Pengirim / Nama" data-en-ph="Sender ID / Name" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <div class="form-field-wrap">
+              <svg class="form-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input type="email" class="form-input" placeholder="Frekuensi Email" data-id-ph="Frekuensi Email" data-en-ph="Email Frequency" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <div class="form-field-wrap textarea-wrap">
+              <textarea class="form-textarea" placeholder="Data Transmisi Pesan" data-id-ph="Data Transmisi Pesan" data-en-ph="Message Transmission Data" rows="5" required></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit">
+            INISIASI TRANSMISI
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Tedi<span>.</span></div>
+  <div class="footer-copy" data-id="© 2025 Tedi Zakaria Perdana. Semua hak dilindungi." data-en="© 2025 Tedi Zakaria Perdana. All rights reserved.">© 2025 Tedi Zakaria Perdana. Semua hak dilindungi.</div>
+</footer>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+// ═══ STATE ═══
+let currentLang = 'id';
+let isDark = true;
+
+// ═══ LANGUAGE SYSTEM ═══
+function setLang(lang){
+  currentLang = lang;
+  // Update button states
+  document.getElementById('lang-id-btn').classList.toggle('active-lang', lang==='id');
+  document.getElementById('lang-en-btn').classList.toggle('active-lang', lang==='en');
+
+  // Update all elements with data-id / data-en
+  document.querySelectorAll('[data-id]').forEach(el=>{
+    const txt = lang==='id' ? el.dataset.id : el.dataset.en;
+    if(txt !== undefined) el.textContent = txt;
+  });
+
+  // Update placeholders
+  document.querySelectorAll('[data-id-ph]').forEach(el=>{
+    el.placeholder = lang==='id' ? el.dataset.idPh : el.dataset.enPh;
+  });
+
+  // Update html lang attribute
+  document.documentElement.lang = lang==='id' ? 'id' : 'en';
+
+  // Persist
+  localStorage.setItem('portfolio_lang', lang);
+}
+
+// ═══ DARK/LIGHT MODE ═══
+function toggleMode(){
+  isDark = !isDark;
+  applyMode();
+  localStorage.setItem('portfolio_mode', isDark ? 'dark' : 'light');
+}
+
+function applyMode(){
+  document.body.classList.toggle('light-mode', !isDark);
+  const iconDark = document.getElementById('mode-icon-dark');
+  const iconLight = document.getElementById('mode-icon-light');
+  const label = document.getElementById('mode-label');
+  if(!isDark){
+    if(iconDark) iconDark.style.display = 'none';
+    if(iconLight) iconLight.style.display = 'block';
+    if(label) label.textContent = currentLang==='id' ? 'Terang' : 'Light';
+  } else {
+    if(iconDark) iconDark.style.display = 'block';
+    if(iconLight) iconLight.style.display = 'none';
+    if(label) label.textContent = currentLang==='id' ? 'Gelap' : 'Dark';
+  }
+}
+
+// ═══ NAV SCROLL ═══
+const nav = document.getElementById('main-nav');
+const scrollTop = document.getElementById('scroll-top');
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+window.addEventListener('scroll',()=>{
+  const y = window.scrollY;
+  nav.classList.toggle('scrolled', y > 20);
+  scrollTop.classList.toggle('visible', y > 400);
+  let current = '';
+  sections.forEach(s=>{
+    if(window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a=>{
+    a.classList.remove('active');
+    if(a.getAttribute('href')==='#'+current) a.classList.add('active');
+  });
+});
+
+// Smooth scroll
+navLinks.forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target) target.scrollIntoView({behavior:'smooth'});
+  });
+});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const href = a.getAttribute('href');
+    if(href.length > 1){
+      const target = document.querySelector(href);
+      if(target){e.preventDefault();target.scrollIntoView({behavior:'smooth'});}
+    }
+  });
+});
+
+// ═══ FADE IN ═══
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.15});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+// ═══ FORM SUBMIT ═══
+function handleSubmit(e){
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-submit');
+  const successMsg = currentLang==='id' ? 'TRANSMISI TERKIRIM ✓' : 'TRANSMISSION SENT ✓';
+  btn.querySelector('span').textContent = successMsg;
+  btn.style.background = 'linear-gradient(135deg,#4fc3a1,#3da88a)';
+  setTimeout(()=>{
+    btn.querySelector('span').textContent = currentLang==='id' ? 'INISIASI TRANSMISI' : 'INITIATE TRANSMISSION';
+    btn.style.background = '';
+    e.target.reset();
+  }, 3000);
+}
+
+// ═══ STATS COUNTER ═══
+function animateValue(el, start, end, duration){
+  let startTime = null;
+  const step = (ts)=>{
+    if(!startTime) startTime = ts;
+    const progress = Math.min((ts - startTime)/duration, 1);
+    const val = Math.floor(progress * (end - start) + start);
+    el.textContent = val + '+';
+    if(progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const statsObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const nums = e.target.querySelectorAll('.about-stat-num');
+      const values = [3,20,10];
+      nums.forEach((el,i)=>animateValue(el,0,values[i],1200));
+      statsObserver.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+const aboutStats = document.querySelector('.about-stats');
+if(aboutStats) statsObserver.observe(aboutStats);
+
+// ═══ INIT ═══
+(function init(){
+  const savedLang = localStorage.getItem('portfolio_lang') || 'id';
+  const savedMode = localStorage.getItem('portfolio_mode') || 'dark';
+  isDark = savedMode === 'dark';
+  applyMode();
+  setLang(savedLang);
+})();
+</script>
+const nav = document.getElementById('main-nav');
+const scrollTop = document.getElementById('scroll-top');
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+window.addEventListener('scroll',()=>{
+  const y = window.scrollY;
+  nav.classList.toggle('scrolled', y > 20);
+  scrollTop.classList.toggle('visible', y > 400);
+
+  // Active nav link
+  let current = '';
+  sections.forEach(s=>{
+    if(window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a=>{
+    a.classList.remove('active');
+    if(a.getAttribute('href')==='#'+current) a.classList.add('active');
+  });
+});
+
+// Smooth scroll for nav links
+navLinks.forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target) target.scrollIntoView({behavior:'smooth'});
+  });
+});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const href = a.getAttribute('href');
+    if(href.length > 1){
+      const target = document.querySelector(href);
+      if(target){e.preventDefault();target.scrollIntoView({behavior:'smooth'});}
+    }
+  });
+});
+
+// Intersection observer for fade-in
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.15});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+// Form submit
+function handleSubmit(e){
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-submit');
+  btn.textContent = 'TRANSMISI TERKIRIM ✓';
+  btn.style.background = 'linear-gradient(135deg,#4fc3a1,#3da88a)';
+  setTimeout(()=>{
+    btn.innerHTML = 'INISIASI TRANSMISI <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    btn.style.background = '';
+    e.target.reset();
+  }, 3000);
+}
+
+// Stats counter animation
+function animateValue(el, start, end, duration){
+  let startTime = null;
+  const suffix = el.textContent.replace(/[0-9]/g,'').replace('+','').trim();
+  const step = (ts)=>{
+    if(!startTime) startTime = ts;
+    const progress = Math.min((ts - startTime)/duration, 1);
+    const val = Math.floor(progress * (end - start) + start);
+    el.textContent = val + '+';
+    if(progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+const statsObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const nums = e.target.querySelectorAll('.about-stat-num');
+      const values = [3,20,10];
+      nums.forEach((el,i)=>animateValue(el,0,values[i],1200));
+      statsObserver.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+const aboutStats = document.querySelector('.about-stats');
+if(aboutStats) statsObserver.observe(aboutStats);
+</script>
+</body>
+</html>
