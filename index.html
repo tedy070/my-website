@@ -3105,6 +3105,24 @@ body{background:var(--bg);transition:background .35s;}
   </div>
 </div>
 
+<!-- MONTH TX LIST MODAL — popup riwayat sebulan, dibuka dgn tap salah satu
+     baris bulan di card Tarik Tunai / Pindah Bank (tab Analytics). Tap
+     salah satu transaksi di sini akan menutup popup ini lalu membuka
+     txDetailModal untuk transaksi tsb. -->
+<div class="moverlay" id="monthTxListModal">
+  <div class="msheet" style="padding:20px 20px calc(var(--safe-bot) + 28px);">
+    <div class="mhandle"></div>
+    <div class="mhdr">
+      <div>
+        <div class="mttl" id="mtl-title">Riwayat Bulan</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px;" id="mtl-sub"></div>
+      </div>
+      <button class="mcls" onclick="closeMonthTxListModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="mtl-list" style="overflow-y:auto;max-height:60vh;display:flex;flex-direction:column;gap:2px;"></div>
+  </div>
+</div>
+
 <!-- EDIT TRANSACTION MODAL -->
 <div class="moverlay" id="editTxModal">
   <div class="msheet" style="padding:20px 20px calc(var(--safe-bot) + 28px);">
@@ -5521,6 +5539,66 @@ function openTxDetail(id){
   document.getElementById('txDetailModal').classList.add('on');
 }
 function closeTxDetailModal(){ document.getElementById('txDetailModal').classList.remove('on'); }
+
+// ══════════════════════════════════════════════════════════════
+// POPUP RIWAYAT PER-BULAN (dari card Tarik Tunai / Pindah Bank)
+// Tap salah satu baris bulan di card Tarik Tunai atau Pindah Bank (tab
+// Analytics) → buka daftar transaksi bulan itu. Tap salah satu transaksi
+// di daftar ini → tutup popup, lalu buka txDetailModal seperti biasa.
+// ══════════════════════════════════════════════════════════════
+function openMonthTxList(catType, monthIdx){
+  const now = new Date();
+  const yr  = now.getFullYear();
+  const filterFn = catType === 'tarik' ? isTarikTx : isPindahBankTx;
+
+  const items = historyItems.filter(h => {
+    if (!h.ts || h.pos) return false; // sama seperti perhitungan bulanan di card: hanya transaksi keluar
+    if (!filterFn(h)) return false;
+    const d = new Date(h.ts);
+    return d.getFullYear() === yr && d.getMonth() === monthIdx;
+  }).sort((a,b) => (b.ts||0) - (a.ts||0));
+
+  const MONTH_NAMES_ID_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const titleTxt = catType === 'tarik' ? '🏧 Tarik Tunai' : '🔁 Pindah Bank';
+  const titleEl  = document.getElementById('mtl-title');
+  const subEl    = document.getElementById('mtl-sub');
+  if (titleEl) titleEl.textContent = titleTxt;
+  if (subEl) subEl.textContent = `${MONTH_NAMES_ID_FULL[monthIdx]} ${yr} · ${items.length} transaksi`;
+
+  const listEl = document.getElementById('mtl-list');
+  if (!listEl) return;
+
+  if (!items.length) {
+    listEl.innerHTML = `<div style="text-align:center;padding:30px 16px;color:var(--t3);font-size:13px;">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1.5" style="display:block;margin:0 auto 10px"><path d="M21 4H3M16 9H3M21 14H3M16 19H3"/></svg>
+      Tidak ada transaksi.
+    </div>`;
+  } else {
+    listEl.innerHTML = items.map(h => {
+      const nm       = escapeHtml(h.langKey ? (T(h.langKey)||h.name) : h.name);
+      const isTarik  = isTarikTx(h);
+      const isPindah = isPindahBankTx(h);
+      const icon = isPindah
+        ? REPEAT_ICON_SVG
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="7" cy="15" r="1" fill="#6B7280"/></svg>';
+      const srcInfo  = h.src ? `<span style="font-size:10px;color:var(--t3);margin-left:4px;">· ${escapeHtml(h.src)}</span>` : '';
+      const destInfo = isTarik && h.dest ? `<span style="font-size:10px;color:var(--t3);margin-left:4px;">→ ${escapeHtml(h.dest)}</span>` : '';
+      const dateBadge = `<span style="font-size:10px;color:var(--t3);margin-left:4px;">· ${new Date(h.ts||0).toLocaleDateString(lang==='id'?'id-ID':'en-US',{day:'2-digit',month:'short'})}</span>`;
+      const amtSign  = isPindah ? '🔄 ' : '🏧 ';
+      return `<div class="h-item" onclick="closeMonthTxListModal();openTxDetail(${h.id})" style="cursor:pointer;">
+        <div class="h-ico" style="background:#F4F6FC;">${icon}</div>
+        <div style="flex:1;">
+          <div class="h-nm">${nm}</div>
+          <div class="h-t">${fmtItemTime(h)}${srcInfo}${destInfo}${dateBadge}</div>
+        </div>
+        <div class="h-a neg" style="color:#6B7280;">${amtSign}${fmt(Math.abs(h.amt))}</div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('monthTxListModal').classList.add('on');
+}
+function closeMonthTxListModal(){ document.getElementById('monthTxListModal').classList.remove('on'); }
 
 function deleteTransactionItem(id){
   const h = historyItems.find(x=>x.id===id);
@@ -8203,7 +8281,7 @@ function buildTarikTunaiCard() {
       .sort((a,b) => a.m - b.m);
     tableEl.innerHTML = rows.map(({m,v}) => {
       const isCur = m === now.getMonth();
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:${isCur?'rgba(26,86,196,.06)':'var(--surface2)'};border-radius:10px;border:1.5px solid ${isCur?'var(--blue2)':'transparent'};">
+      return `<div onclick="openMonthTxList('tarik',${m})" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:${isCur?'rgba(26,86,196,.06)':'var(--surface2)'};border-radius:10px;border:1.5px solid ${isCur?'var(--blue2)':'transparent'};">
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="width:8px;height:8px;border-radius:2px;background:${isCur?'var(--blue2)':'#6B7280'};opacity:${isCur?1:.65};"></div>
           <span style="font-family:var(--f);font-size:13px;font-weight:600;color:var(--navy);">${MONTH_NAMES_ID[m]} ${yr}</span>
@@ -8281,7 +8359,7 @@ function buildPindahBankCard() {
       .sort((a,b) => a.m - b.m);
     tableEl.innerHTML = rows.map(({m,v}) => {
       const isCur = m === now.getMonth();
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:${isCur?'rgba(124,58,237,.06)':'var(--surface2)'};border-radius:10px;border:1.5px solid ${isCur?'#7C3AED':'transparent'};">
+      return `<div onclick="openMonthTxList('pindah_bank',${m})" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:${isCur?'rgba(124,58,237,.06)':'var(--surface2)'};border-radius:10px;border:1.5px solid ${isCur?'#7C3AED':'transparent'};">
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="width:8px;height:8px;border-radius:2px;background:${isCur?'#7C3AED':'#6B7280'};opacity:${isCur?1:.65};"></div>
           <span style="font-family:var(--f);font-size:13px;font-weight:600;color:var(--navy);">${MONTH_NAMES_ID[m]} ${yr}</span>
