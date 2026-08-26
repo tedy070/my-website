@@ -2365,18 +2365,49 @@ body{background:var(--bg);transition:background .35s;}
           <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--teal);display:inline-block;opacity:.9;"></span>Income</span>
         </div>
       </div>
-      <!-- TARIK TUNAI BULANAN -->
-      <div class="cc" id="tarikTunaiCard">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <div class="cc-ttl">🏧 Tarik Tunai / Cash Withdrawal</div>
-          <div id="tarikTunaiTotal" style="font-family:var(--f);font-size:14px;font-weight:700;color:var(--blue2);"></div>
+      <!-- ── Card Stack: Tarik Tunai ⇄ Pindah Bank (per bulan) ──
+           Dua card berbagi satu slot dan auto-bergantian (crossfade) setiap
+           beberapa detik saat tab Analytics sedang dibuka — mekanismenya
+           persis sama dengan stack "Total Anggaran ⇄ Sisa Anggaran vs Wallet
+           Utama" di tab Savings (crossfade otomatis + dot indicator + swipe
+           manual). Kalau belum ada data Pindah Bank tahun ini (card kedua
+           kosong), hanya Card Tarik Tunai yang tampil dan rotasi tidak
+           berjalan. -->
+      <div id="ttpb-stack" style="position:relative;touch-action:pan-y;" onpointerdown="_ttpbSwipeStart(event)" onpointerup="_ttpbSwipeEnd(event)" onpointercancel="_ttpbSwipeCancel()">
+
+        <!-- Card 1: Tarik Tunai bulanan -->
+        <div class="cc" id="tarikTunaiCard" style="opacity:1;transition:opacity .3s ease;" onclick="_ttpbOnInteract()">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <div class="cc-ttl">🏧 Tarik Tunai / Cash Withdrawal</div>
+            <div id="tarikTunaiTotal" style="font-family:var(--f);font-size:14px;font-weight:700;color:var(--blue2);"></div>
+          </div>
+          <div class="cc-sub">Jumlah tarik tunai per bulan · tahun ini</div>
+          <div id="tarikTunaiMonthlyBars" style="display:flex;align-items:flex-end;gap:2px;margin-top:14px;height:90px;"></div>
+          <div style="display:flex;gap:4px;margin-top:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;" id="tarikTunaiMonthLabels"></div>
+          <div id="tarikTunaiEmpty" style="display:none;text-align:center;padding:22px 0;color:var(--t3);font-size:13px;">Belum ada tarik tunai tahun ini.</div>
+          <!-- Tabel bulanan -->
+          <div id="tarikTunaiTable" style="margin-top:14px;display:flex;flex-direction:column;gap:6px;"></div>
         </div>
-        <div class="cc-sub">Jumlah tarik tunai per bulan · tahun ini</div>
-        <div id="tarikTunaiMonthlyBars" style="display:flex;align-items:flex-end;gap:2px;margin-top:14px;height:90px;"></div>
-        <div style="display:flex;gap:4px;margin-top:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;" id="tarikTunaiMonthLabels"></div>
-        <div id="tarikTunaiEmpty" style="display:none;text-align:center;padding:22px 0;color:var(--t3);font-size:13px;">Belum ada tarik tunai tahun ini.</div>
-        <!-- Tabel bulanan -->
-        <div id="tarikTunaiTable" style="margin-top:14px;display:flex;flex-direction:column;gap:6px;"></div>
+
+        <!-- Card 2: Pindah Bank bulanan (berbagi slot dengan Card Tarik Tunai) -->
+        <div class="cc" id="pindahBankCard" style="display:none;opacity:0;transition:opacity .3s ease;" onclick="_ttpbOnInteract()">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <div class="cc-ttl">🔁 Pindah Bank / Bank Transfer</div>
+            <div id="pindahBankTotal" style="font-family:var(--f);font-size:14px;font-weight:700;color:#7C3AED;"></div>
+          </div>
+          <div class="cc-sub">Jumlah pindah bank per bulan · tahun ini</div>
+          <div id="pindahBankMonthlyBars" style="display:flex;align-items:flex-end;gap:2px;margin-top:14px;height:90px;"></div>
+          <div style="display:flex;gap:4px;margin-top:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;" id="pindahBankMonthLabels"></div>
+          <div id="pindahBankEmpty" style="display:none;text-align:center;padding:22px 0;color:var(--t3);font-size:13px;">Belum ada pindah bank tahun ini.</div>
+          <!-- Tabel bulanan -->
+          <div id="pindahBankTable" style="margin-top:14px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+
+        <!-- Dot indicator — hanya muncul kalau kedua card tersedia utk dirotasi -->
+        <div id="ttpb-dots" style="display:none;justify-content:center;align-items:center;gap:5px;margin:-8px 0 16px;">
+          <span id="ttpb-dot-0" class="asc-dot" onclick="_ttpbManualGoTo(0)" style="width:16px;height:6px;border-radius:4px;background:var(--blue2);cursor:pointer;transition:all .25s ease;"></span>
+          <span id="ttpb-dot-1" class="asc-dot" onclick="_ttpbManualGoTo(1)" style="width:6px;height:6px;border-radius:4px;background:var(--border);cursor:pointer;transition:all .25s ease;"></span>
+        </div>
       </div>
 
       <div class="tip-card">
@@ -6578,6 +6609,7 @@ function switchTab(tab){
   if(tab==='savings'){ renderGoals(); updateSavingsTotal(); renderWalletSummary(); }
   if(tab==='analytics'){ refreshAnalytics(); }
   if(tab!=='savings'){ _ascFullStop(); }
+  if(tab!=='analytics'){ _ttpbFullStop(); }
   moveNavIndicator(tab);
 }
 
@@ -8131,16 +8163,19 @@ function buildTarikTunaiCard() {
   const emptyEl  = document.getElementById('tarikTunaiEmpty');
   const tableEl  = document.getElementById('tarikTunaiTable');
   const totalEl  = document.getElementById('tarikTunaiTotal');
+  const cardEl   = document.getElementById('tarikTunaiCard');
+  if (cardEl) cardEl.dataset.hasData = total > 0 ? '1' : '0';
 
   if (totalEl) totalEl.textContent = total > 0 ? fmt(total) : '';
 
-  if (!barsEl || !labelsEl) return;
+  if (!barsEl || !labelsEl) { ttpbStackSync(); return; }
 
   if (total === 0) {
     barsEl.innerHTML = '';
     labelsEl.innerHTML = '';
     if (tableEl) tableEl.innerHTML = '';
     if (emptyEl) emptyEl.style.display = 'block';
+    ttpbStackSync();
     return;
   }
   if (emptyEl) emptyEl.style.display = 'none';
@@ -8176,6 +8211,224 @@ function buildTarikTunaiCard() {
         <span style="font-family:var(--f);font-size:13px;font-weight:700;color:${isCur?'var(--blue2)':'var(--navy)'};">${fmt(v)}</span>
       </div>`;
     }).join('');
+  }
+  ttpbStackSync();
+}
+
+// ── Pindah Bank per bulan card ──
+// Persis sama strukturnya dengan buildTarikTunaiCard() di atas, cuma sumber
+// datanya kategori 'pindah_bank' (lihat isPindahBankTx()). Card ini berbagi
+// satu slot dengan Card Tarik Tunai lewat #ttpb-stack (lihat ttpbStackSync
+// dkk di bawah).
+function buildPindahBankCard() {
+  const now = new Date();
+  const yr  = now.getFullYear();
+  const MONTH_NAMES_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+  const monthly = Array(12).fill(0);
+  historyItems.forEach(h => {
+    if (!h.ts || !isPindahBankTx(h)) return;
+    const d = new Date(h.ts);
+    if (d.getFullYear() !== yr) return;
+    if (!h.pos) monthly[d.getMonth()] += Math.abs(h.amt || 0);
+  });
+
+  const total = monthly.reduce((s,v)=>s+v,0);
+  const mx    = Math.max(...monthly, 1);
+
+  const barsEl   = document.getElementById('pindahBankMonthlyBars');
+  const labelsEl = document.getElementById('pindahBankMonthLabels');
+  const emptyEl  = document.getElementById('pindahBankEmpty');
+  const tableEl  = document.getElementById('pindahBankTable');
+  const totalEl  = document.getElementById('pindahBankTotal');
+  const cardEl   = document.getElementById('pindahBankCard');
+  if (cardEl) cardEl.dataset.hasData = total > 0 ? '1' : '0';
+
+  if (totalEl) totalEl.textContent = total > 0 ? fmt(total) : '';
+
+  if (!barsEl || !labelsEl) { ttpbStackSync(); return; }
+
+  if (total === 0) {
+    barsEl.innerHTML = '';
+    labelsEl.innerHTML = '';
+    if (tableEl) tableEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    ttpbStackSync();
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  // Bar chart
+  barsEl.innerHTML = MONTH_NAMES_ID.map((mn, i) => {
+    const isCur  = i === now.getMonth();
+    const h      = monthly[i] > 0 ? Math.max(Math.round((monthly[i]/mx)*80), 6) : 2;
+    const bgCol  = isCur ? '#7C3AED' : '#6B7280';
+    const opacity= isCur ? 1 : (monthly[i]>0 ? 0.65 : 0.2);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+      <div style="font-size:8px;color:var(--t3);min-height:12px;">${monthly[i]>0?fmt(monthly[i]).replace('Rp ','').replace(' jt','jt'):''}
+      </div>
+      <div style="height:${h}px;width:100%;max-width:22px;border-radius:4px 4px 0 0;background:${bgCol};opacity:${opacity};transition:height .4s;" title="${mn}: ${fmt(monthly[i])}"></div>
+      <div style="font-size:9px;color:${isCur?'#7C3AED':'var(--t3)'};font-weight:${isCur?700:400};">${mn}</div>
+    </div>`;
+  }).join('');
+  labelsEl.innerHTML = '';
+
+  // Tabel ringkasan bulan yang ada pindah bank
+  if (tableEl) {
+    const rows = monthly
+      .map((v,i) => ({m:i, v}))
+      .filter(x => x.v > 0)
+      .sort((a,b) => a.m - b.m);
+    tableEl.innerHTML = rows.map(({m,v}) => {
+      const isCur = m === now.getMonth();
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:${isCur?'rgba(124,58,237,.06)':'var(--surface2)'};border-radius:10px;border:1.5px solid ${isCur?'#7C3AED':'transparent'};">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:8px;height:8px;border-radius:2px;background:${isCur?'#7C3AED':'#6B7280'};opacity:${isCur?1:.65};"></div>
+          <span style="font-family:var(--f);font-size:13px;font-weight:600;color:var(--navy);">${MONTH_NAMES_ID[m]} ${yr}</span>
+        </div>
+        <span style="font-family:var(--f);font-size:13px;font-weight:700;color:${isCur?'#7C3AED':'var(--navy)'};">${fmt(v)}</span>
+      </div>`;
+    }).join('');
+  }
+  ttpbStackSync();
+}
+
+// ── Rotasi otomatis: Card Tarik Tunai ⇄ Card Pindah Bank ──
+// Sama persis mekanismenya dengan rotasi Total Anggaran ⇄ Sisa Anggaran vs
+// Wallet Utama (lihat anggaranSummaryStackSync dkk): dua card berbagi satu
+// slot (#ttpb-stack), auto-crossfade tiap beberapa detik selama tab
+// Analytics sedang dibuka, ada dot indicator, dan bisa digeser manual
+// (swipe). Kalau Card Pindah Bank belum ada data tahun ini, hanya Card
+// Tarik Tunai yang tampil dan rotasi tidak berjalan. Interaksi (tap card,
+// tap dot, swipe) menjeda rotasi otomatis selama TTPB_ROTATE_RESUME_DELAY.
+const TTPB_ROTATE_RESUME_DELAY = 8000; // 8 detik jeda sebelum lanjut auto lagi
+let _ttpbRotateTimer = null;
+let _ttpbRotateIdx = 0;
+let _ttpbIdleTimer = null;
+let _ttpbPaused = false;
+
+function ttpbStackSync(){
+  const tarikCard  = document.getElementById('tarikTunaiCard');
+  const pindahCard = document.getElementById('pindahBankCard');
+  const dots       = document.getElementById('ttpb-dots');
+  const panel      = document.getElementById('tab-analytics');
+  if(!tarikCard || !pindahCard) return;
+
+  const panelVisible  = !!(panel && panel.offsetParent !== null);
+  const hasPindahData = pindahCard.dataset.hasData === '1';
+
+  if(!panelVisible || !hasPindahData){
+    _ttpbFullStop();
+    _ttpbRotateIdx = 0;
+    tarikCard.style.display = 'block'; tarikCard.style.opacity = '1';
+    pindahCard.style.display = 'none'; pindahCard.style.opacity = '0';
+    if(dots) dots.style.display = 'none';
+    return;
+  }
+
+  if(dots) dots.style.display = 'flex';
+  if(!_ttpbRotateTimer && !_ttpbPaused) startTtpbRotate();
+}
+
+function startTtpbRotate(startIdx){
+  stopTtpbRotate();
+  _ttpbRotateIdx = startIdx || 0;
+  _ttpbGoTo(_ttpbRotateIdx);
+  _ttpbRotateTimer = setInterval(()=>{
+    _ttpbGoTo(_ttpbRotateIdx === 0 ? 1 : 0);
+  }, 5000);
+}
+function stopTtpbRotate(){
+  if(_ttpbRotateTimer){ clearInterval(_ttpbRotateTimer); _ttpbRotateTimer = null; }
+}
+function _clearTtpbIdleTimer(){
+  if(_ttpbIdleTimer){ clearTimeout(_ttpbIdleTimer); _ttpbIdleTimer = null; }
+}
+// Dipakai saat benar² keluar dari tab Analytics — beda dgn stopTtpbRotate()
+// biasa yg hanya berhenti sementara saat card disentuh.
+function _ttpbFullStop(){
+  stopTtpbRotate();
+  _clearTtpbIdleTimer();
+  _ttpbPaused = false;
+}
+
+function _ttpbOnInteract(){
+  const pindahCard = document.getElementById('pindahBankCard');
+  if(!pindahCard || pindahCard.dataset.hasData !== '1') return; // cuma 1 card, tidak ada yg perlu dijeda
+  _ttpbPaused = true;
+  stopTtpbRotate();
+  _clearTtpbIdleTimer();
+  _ttpbIdleTimer = setTimeout(()=>{
+    _ttpbPaused = false;
+    _ttpbIdleTimer = null;
+    startTtpbRotate(_ttpbRotateIdx); // lanjut dari card yg sedang tampil
+  }, TTPB_ROTATE_RESUME_DELAY);
+}
+
+// Tap dot indicator → pindah manual ke card yg dipilih & jeda rotasi.
+function _ttpbManualGoTo(idx){
+  const pindahCard = document.getElementById('pindahBankCard');
+  if(idx === 1 && (!pindahCard || pindahCard.dataset.hasData !== '1')) return;
+  _ttpbGoTo(idx);
+  _ttpbOnInteract();
+}
+
+// ── Geser manual (swipe) antar card — pola sama dengan _ascSwipe* ──
+const TTPB_SWIPE_THRESHOLD = 40; // px, jarak minimal horizontal dianggap swipe
+let _ttpbSwipeStartX = null;
+let _ttpbSwipeStartY = null;
+
+function _ttpbSwipeStart(e){
+  _ttpbSwipeStartX = e.clientX;
+  _ttpbSwipeStartY = e.clientY;
+}
+function _ttpbSwipeCancel(){
+  _ttpbSwipeStartX = null;
+  _ttpbSwipeStartY = null;
+}
+function _ttpbSwipeEnd(e){
+  if(_ttpbSwipeStartX === null){ return; }
+  const dx = e.clientX - _ttpbSwipeStartX;
+  const dy = e.clientY - _ttpbSwipeStartY;
+  _ttpbSwipeStartX = null;
+  _ttpbSwipeStartY = null;
+
+  if(Math.abs(dx) < TTPB_SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return;
+
+  const pindahCard = document.getElementById('pindahBankCard');
+  if(!pindahCard || pindahCard.dataset.hasData !== '1') return; // cuma 1 card
+
+  const nextIdx = dx < 0 ? 1 : 0; // geser kiri → card berikutnya, geser kanan → card sebelumnya
+  if(nextIdx === _ttpbRotateIdx) return;
+  _ttpbManualGoTo(nextIdx);
+}
+
+// Pindah ke card index tertentu (0=Tarik Tunai, 1=Pindah Bank) dengan
+// crossfade halus. Bisa dipanggil manual lewat tap dot indicator / swipe.
+function _ttpbGoTo(idx){
+  const tarikCard  = document.getElementById('tarikTunaiCard');
+  const pindahCard = document.getElementById('pindahBankCard');
+  const dot0       = document.getElementById('ttpb-dot-0');
+  const dot1       = document.getElementById('ttpb-dot-1');
+  if(!tarikCard || !pindahCard) return;
+  _ttpbRotateIdx = idx;
+
+  const showEl = idx === 0 ? tarikCard : pindahCard;
+  const hideEl = idx === 0 ? pindahCard : tarikCard;
+
+  hideEl.style.opacity = '0';
+  setTimeout(()=>{
+    hideEl.style.display = 'none';
+    showEl.style.display = 'block';
+    void showEl.offsetWidth; // paksa reflow biar transisi opacity jalan
+    showEl.style.opacity = '1';
+  }, 260);
+
+  if(dot0 && dot1){
+    dot0.style.background = idx === 0 ? 'var(--blue2)' : 'var(--border)';
+    dot0.style.width      = idx === 0 ? '16px' : '6px';
+    dot1.style.background = idx === 1 ? 'var(--blue2)' : 'var(--border)';
+    dot1.style.width      = idx === 1 ? '16px' : '6px';
   }
 }
 
@@ -8448,6 +8701,7 @@ function refreshAnalytics() {
   buildMonthlyChart();
   buildYearlyChart();
   buildTarikTunaiCard();
+  buildPindahBankCard();
 }
 
 function setWTab(el, mode) {
