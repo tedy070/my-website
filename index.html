@@ -2638,7 +2638,7 @@ body{background:var(--bg);transition:background .35s;}
                 </div>
                 <span id="bwc-status-badge" style="display:none;font-size:9px;font-weight:800;letter-spacing:.3px;padding:3px 8px;border-radius:8px;color:#fff;"></span>
               </div>
-              <div style="font-size:11px;color:var(--t3);margin-bottom:14px;">Bandingkan sisa anggaran bulan ini dengan saldo wallet acuan</div>
+              <div style="font-size:11px;color:var(--t3);margin-bottom:14px;" id="bwc-sub-lbl">Bandingkan sisa anggaran bulan ini dengan saldo wallet acuan</div>
 
               <div style="display:flex;gap:10px;margin-bottom:14px;">
                 <div style="flex:1;background:var(--surface2);border-radius:14px;padding:12px;cursor:pointer;" onclick="toggleBudgetRemainingBreakdown()">
@@ -5549,7 +5549,15 @@ function closeTxDetailModal(){ document.getElementById('txDetailModal').classLis
 function openMonthTxList(catType, monthIdx){
   const now = new Date();
   const yr  = now.getFullYear();
-  const filterFn = catType === 'tarik' ? isTarikTx : isPindahBankTx;
+  // NB: isTarikTx() sengaja bersifat luas (juga mencocokkan 'pindah_bank')
+  // karena dipakai di banyak tempat lain untuk "bukan expense/income riil".
+  // Di sini kita butuh filter yang EKSKLUSIF per kategori supaya popup
+  // Tarik Tunai tidak ikut menampilkan riwayat Pindah Bank, jadi pakai
+  // pengecekan cat yang persis sama dengan yang dipakai saat menghitung
+  // total bulanan di buildTarikTunaiCard() / buildPindahBankCard().
+  const filterFn = catType === 'tarik'
+    ? (h => h.cat === 'tarik')
+    : isPindahBankTx;
 
   const items = historyItems.filter(h => {
     if (!h.ts || h.pos) return false; // sama seperti perhitungan bulanan di card: hanya transaksi keluar
@@ -9929,9 +9937,22 @@ function calcInput(btn){
     return;
   }
   if(['+','-','*','/'].includes(btn)){
+    // Kalkulator normal: kalau sudah ada operasi tertunda DAN user sudah
+    // mengetik angka baru sejak operator terakhir, hitung dulu hasil
+    // sementaranya sebelum lanjut ke operator berikutnya. Ini yang bikin
+    // "5 + 3 + 2 =" bisa langsung jalan berantai tanpa harus tekan "="
+    // di setiap langkah. Kalau user cuma ganti pikiran operator (belum
+    // sempat ketik angka baru), operator lama cukup diganti saja.
+    if(calcPrev!==null && calcOp && !calcNew){
+      const a=parseFloat(calcPrev), b=parseFloat(calcVal.replace(/,/g,'').replace(/\./g,'')||'0');
+      let r;
+      if(calcOp==='+')r=a+b; else if(calcOp==='-')r=a-b; else if(calcOp==='*')r=a*b; else r=b?a/b:0;
+      calcVal=r.toString();
+      d.textContent=fmtCalc(calcVal);
+    }
     calcPrev=calcVal.replace(/,/g,'').replace(/\./g,''); calcOp=btn; calcNew=true;
     const sym={'+':'+','-':'−','*':'×','/':'÷'}[btn];
-    h.textContent=`${fmtCalc(calcPrev)} ${sym}`; return;
+    h.textContent=`${fmtCalc(calcPrev)} ${sym}`; updCalcFmt(); return;
   }
   if(btn==='.'){
     if(calcNew){calcVal='0.';calcNew=false;}
@@ -10900,6 +10921,8 @@ function updateAnggaranBulanLabel(){
   if(el) el.textContent = `${MONTH_NAMES_ID_ANG[anggaranMonth]} ${anggaranYear}`;
   const sumLbl = document.getElementById('anggaran-summary-lbl');
   if(sumLbl) sumLbl.textContent = `Total Anggaran (${MONTH_NAMES_ID_ANG[anggaranMonth]})`;
+  const bwcSubLbl = document.getElementById('bwc-sub-lbl');
+  if(bwcSubLbl) bwcSubLbl.textContent = `Bandingkan sisa anggaran ${MONTH_NAMES_ID_ANG[anggaranMonth]} dengan saldo wallet acuan`;
 }
 
 function anggaranPrevMonth(){
@@ -10907,12 +10930,14 @@ function anggaranPrevMonth(){
   if(anggaranMonth < 0){ anggaranMonth = 11; anggaranYear--; }
   updateAnggaranBulanLabel();
   renderAnggaranList();
+  renderBudgetWalletCompare();
 }
 function anggaranNextMonth(){
   anggaranMonth++;
   if(anggaranMonth > 11){ anggaranMonth = 0; anggaranYear++; }
   updateAnggaranBulanLabel();
   renderAnggaranList();
+  renderBudgetWalletCompare();
 }
 
 function _anggaranPeriodeKey(){ return `${anggaranYear}-${String(anggaranMonth+1).padStart(2,'0')}`; }
@@ -11258,13 +11283,17 @@ function scheduleDailyBudgetMidnightRefresh(){
 // kategori anggaran aktif. Kategori yang sudah over-budget dihitung 0
 // (bukan negatif) supaya tidak mengecoh angka totalnya. Juga mengembalikan
 // rincian per kategori (items) untuk breakdown yang bisa di-expand di card.
-function calcTotalBudgetRemaining(){
-  const now = new Date();
-  const periodeKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const monthBudgets = (typeof budgets !== 'undefined' ? budgets : []).filter(b => b.periode === periodeKey && b.active !== false);
+// periodeKey opsional (format 'YYYY-MM'). Default-nya sekarang mengikuti
+// bulan yang sedang dibuka user di navigator Anggaran (anggaranYear/
+// anggaranMonth), BUKAN selalu bulan berjalan — supaya card "Sisa Anggaran
+// vs Wallet Utama" konsisten dengan card "Total Anggaran" di atasnya saat
+// user pindah bulan pakai tombol ◀ ▶.
+function calcTotalBudgetRemaining(periodeKey){
+  const key = periodeKey || _anggaranPeriodeKey();
+  const monthBudgets = (typeof budgets !== 'undefined' ? budgets : []).filter(b => b.periode === key && b.active !== false);
   if(!monthBudgets.length) return { total: 0, count: 0, items: [] };
 
-  const spent = calcSpentForPeriode(periodeKey);
+  const spent = calcSpentForPeriode(key);
   let total = 0;
   const items = [];
   monthBudgets.forEach(b => {
