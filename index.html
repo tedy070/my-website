@@ -2097,9 +2097,9 @@ body{background:var(--bg);transition:background .35s;}
             <span class="gain-b" id="h-gain-badge">↗ +0%</span>
             <span style="font-size:11px;opacity:.7" id="h-gain">Monthly Gain</span>
           </div>
-          <button class="topup-btn" onclick="openAddModal()">
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span id="h-topup">Top Up</span>
+          <button class="topup-btn" onclick="openBalanceHistoryModal()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            <span id="h-topup">Riwayat Saldo</span>
           </button>
         </div>
       </div>
@@ -3120,6 +3120,26 @@ body{background:var(--bg);transition:background .35s;}
       <button class="mcls" onclick="closeMonthTxListModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div id="mtl-list" style="overflow-y:auto;max-height:60vh;display:flex;flex-direction:column;gap:2px;"></div>
+  </div>
+</div>
+
+<!-- BALANCE HISTORY MODAL — dibuka dari tombol di Card Total Saldo (Beranda).
+     Menampilkan riwayat Total Saldo di akhir tiap bulan (mundur dari saldo
+     sekarang, dihitung dari selisih pemasukan-pengeluaran riil per bulan —
+     Tarik Tunai & Pindah Bank tidak dihitung sbg pemasukan/pengeluaran
+     karena keduanya cuma perpindahan uang, bukan perubahan kekayaan). -->
+<div class="moverlay" id="balanceHistoryModal">
+  <div class="msheet" style="padding:20px 20px calc(var(--safe-bot) + 28px);">
+    <div class="mhandle"></div>
+    <div class="mhdr">
+      <div>
+        <div class="mttl">📊 Riwayat Saldo Bulanan</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px;" id="bhm-sub"></div>
+      </div>
+      <button class="mcls" onclick="closeBalanceHistoryModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="bhm-bars" style="display:flex;align-items:flex-end;gap:4px;height:90px;margin-bottom:16px;"></div>
+    <div id="bhm-list" style="overflow-y:auto;max-height:48vh;display:flex;flex-direction:column;gap:6px;"></div>
   </div>
 </div>
 
@@ -5608,6 +5628,113 @@ function openMonthTxList(catType, monthIdx){
 }
 function closeMonthTxListModal(){ document.getElementById('monthTxListModal').classList.remove('on'); }
 
+// ══════════════════════════════════════════════════════════════
+// RIWAYAT SALDO BULANAN (Card Total Saldo di Beranda)
+// Tombol yang tadinya "Isi Saldo/Top Up" sekarang membuka popup riwayat
+// Total Saldo di akhir tiap bulan. Karena app tidak menyimpan snapshot
+// saldo per bulan secara eksplisit, angkanya direkonstruksi mundur dari
+// saldo SEKARANG (real-time) memakai net bulanan (pemasukan - pengeluaran
+// riil) — persis rumus yang sama dipakai badge "Kenaikan Bulanan" di card
+// ini (lihat updateAllAmounts()/computeGainBadgeState()), supaya kedua
+// angka selalu konsisten satu sama lain. Tarik Tunai & Pindah Bank
+// sengaja TIDAK dihitung sbg pemasukan/pengeluaran karena keduanya cuma
+// perpindahan uang antar akun/bentuk milik sendiri, bukan perubahan
+// kekayaan riil (konsisten dgn isTarikTx() dipakai di seluruh app).
+// ══════════════════════════════════════════════════════════════
+function computeMonthlyBalanceHistory(maxMonths){
+  const now = new Date();
+  const curY = now.getFullYear(), curM = now.getMonth();
+
+  // Batasi jumlah bulan ke rentang data transaksi yang benar-benar ada,
+  // supaya tidak menampilkan bulan-bulan kosong sebelum akun ini dipakai.
+  let monthsBack = maxMonths || 12;
+  if(historyItems.length){
+    const earliestTs = historyItems.reduce((min,h)=> (h.ts && h.ts<min) ? h.ts : min, Date.now());
+    const eDate = new Date(earliestTs);
+    const span = (curY - eDate.getFullYear())*12 + (curM - eDate.getMonth()) + 1;
+    monthsBack = Math.min(monthsBack, Math.max(1, span));
+  } else {
+    monthsBack = 1;
+  }
+
+  // Net per bulan (income - expense riil), mundur dari bulan ini
+  const months = [];
+  for(let i=0;i<monthsBack;i++){
+    let y = curY, m = curM - i;
+    while(m < 0){ m += 12; y--; }
+    const mStart = new Date(y, m, 1);
+    const mEnd   = new Date(y, m+1, 1);
+    const mItems = historyItems.filter(h => h.ts && new Date(h.ts) >= mStart && new Date(h.ts) < mEnd);
+    const inc = mItems.filter(h => h.pos).reduce((s,h) => s + Math.abs(h.amt||0), 0);
+    const exp = mItems.filter(h => !h.pos && !isTarikTx(h)).reduce((s,h) => s + Math.abs(h.amt||0), 0);
+    months.push({ year: y, month: m, net: inc - exp });
+  }
+
+  // Mundur dari saldo sekarang (real-time) untuk dapat saldo akhir tiap bulan
+  let endBal = balance;
+  const result = [];
+  for(let i=0;i<months.length;i++){
+    result.push({ year: months[i].year, month: months[i].month, endBalance: endBal });
+    endBal -= months[i].net;
+  }
+  return result; // urut dari bulan terbaru ke terlama
+}
+
+function openBalanceHistoryModal(){
+  const MONTH_NAMES_ID_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const MONTH_NAMES_ID_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const now = new Date();
+  const hist = computeMonthlyBalanceHistory(12); // terbaru → terlama
+
+  const subEl = document.getElementById('bhm-sub');
+  if(subEl) subEl.textContent = hist.length > 1
+    ? `${hist.length} bulan terakhir`
+    : 'Belum cukup data untuk riwayat bulanan';
+
+  // Bar chart — urut kronologis (lama → baru) biar enak dibaca dari kiri ke kanan
+  const chronological = hist.slice().reverse();
+  const maxVal = Math.max(...chronological.map(h => Math.max(h.endBalance,0)), 1);
+  const barsEl = document.getElementById('bhm-bars');
+  if(barsEl){
+    barsEl.innerHTML = chronological.map(h => {
+      const isCur = h.year === now.getFullYear() && h.month === now.getMonth();
+      const hgt = h.endBalance > 0 ? Math.max(Math.round((h.endBalance/maxVal)*80), 4) : 2;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="height:${hgt}px;width:100%;max-width:20px;border-radius:4px 4px 0 0;background:${isCur?'var(--blue2)':'#93B4E8'};transition:height .4s;" title="${MONTH_NAMES_ID_SHORT[h.month]} ${h.year}: ${fmt(h.endBalance)}"></div>
+        <div style="font-size:9px;color:${isCur?'var(--blue2)':'var(--t3)'};font-weight:${isCur?700:400};">${MONTH_NAMES_ID_SHORT[h.month]}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // List — urut terbaru dulu, tiap baris ada perubahan (▲/▼) vs bulan sebelumnya
+  const listEl = document.getElementById('bhm-list');
+  if(listEl){
+    listEl.innerHTML = hist.map((h, idx) => {
+      const isCur = idx === 0;
+      const prev = hist[idx+1]; // bulan yg lebih lama (hist urut terbaru→terlama)
+      let deltaHtml = '';
+      if(prev){
+        const diff  = h.endBalance - prev.endBalance;
+        const sign  = diff >= 0 ? '+' : '-';
+        const arrow = diff >= 0 ? '↗' : '↘';
+        const color = diff >= 0 ? 'var(--green)' : 'var(--red)';
+        const pctTxt = prev.endBalance !== 0 ? ` (${sign}${Math.abs((diff/Math.abs(prev.endBalance))*100).toFixed(1)}%)` : '';
+        deltaHtml = `<div style="margin-top:2px;font-size:11px;color:${color};font-weight:600;">${arrow} ${sign}${fmt(Math.abs(diff))}${pctTxt}</div>`;
+      }
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:${isCur?'rgba(26,86,196,.06)':'var(--surface2)'};border-radius:12px;border:1.5px solid ${isCur?'var(--blue2)':'transparent'};">
+        <div>
+          <div style="font-family:var(--f);font-size:13px;font-weight:700;color:var(--navy);">${MONTH_NAMES_ID_FULL[h.month]} ${h.year}${isCur ? ' <span style="font-size:9px;font-weight:700;color:var(--blue2);">· Saat ini</span>' : ''}</div>
+          ${deltaHtml}
+        </div>
+        <span style="font-family:var(--f);font-size:14px;font-weight:800;color:${isCur?'var(--blue2)':'var(--navy)'};">${fmt(h.endBalance)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('balanceHistoryModal').classList.add('on');
+}
+function closeBalanceHistoryModal(){ document.getElementById('balanceHistoryModal').classList.remove('on'); }
+
 function deleteTransactionItem(id){
   const h = historyItems.find(x=>x.id===id);
   if(!h) return;
@@ -6556,7 +6683,7 @@ function updateAllAmounts(){
 // LANGUAGE
 // ============================================================
 const TR={
-  en:{'s-title':'Track Money <em>Like a Pro</em>','s-sub':'Master your finances with editorial-grade analytics and curated spending insights.','s-start':'Get Started','s-have':'Already have an account?','s-login':'Log In','s-badge':'● SYSTEM ONLINE','ql-title':'Welcome Back','ql-sub':'Tap your profile photo to sign in fast','ql-other':'Log in with another account','l-title':'Welcome Back','l-back':'Back','l-sub':'Access your curated financial dashboard','l-elbl':'EMAIL ADDRESS','l-plbl':'PASSWORD','l-forgot':'Forgot Password?','l-btn':'Login','l-or':'OR CONTINUE WITH','l-new':'New to the platform?','l-create':'Create Account','l-footer':'© 2024 MANTAPPS. SECURE. PRIVATE. ESSENTIAL.','loginEmailErr':'Invalid email format','loginPwErr':'Incorrect email or password','r-title':'Create Account','r-back':'Back','r-sub':'Join thousands managing money smarter','r-nlbl':'FULL NAME','r-elbl':'EMAIL ADDRESS','r-plbl':'PASSWORD','r-p2lbl':'CONFIRM PASSWORD','r-btn':'Create Account','r-have':'Already have an account?','r-login':'Log In','regNameErr':'Name is required','regEmailErr':'Invalid email format','regPwErr':'Password must be at least 6 characters','regPw2Err':'Passwords do not match','f-title':'Forgot Password?','f-sub':"Enter your email and we'll send a reset link",'f-elbl':'EMAIL ADDRESS','f-btn':'Send Reset Link','f-back':'Back to Login','f-back2':'← Back to Login','forgotEmailErr':'Invalid email format','h-ballbl':'TOTAL BALANCE','h-gain':'Monthly Gain','h-topup':'Top Up','h-spending':'Monthly Spending','h-view':'View Details','h-recent':'Recent Transactions','h-life':'LIFESTYLE','h-food':'FOOD','h-trans':'TRANSPORT','h-health':'CHARITY','h-shop':'SHOPPING','h-tech':'MARRIAGE','a-overview':'MONTHLY OVERVIEW','a-less':'12% less than last month','a-cat':'Spending by Category','a-goes':'Where your money goes','a-housing':'Housing','a-food':'Food & Dining','a-transport':'Transport','a-leisure':'Leisure','a-top':'Top Categories','a-re':'Top Category 1','a-gas':'Top Category 2','a-ls':'Top Category 3','a-weekly':'Weekly Breakdown','a-7days':'Last 7 days of activity','a-spend':'SPENDING','a-income':'INCOME','a-stip':'Smart Savings Tip','a-tiptext':'You spent 24% more on Dining Out this week. Switch to home cooking twice a week to reach your goal faster!','a-limit':'Set Spending Limit','sv-prog':'TOTAL PROGRESS','sv-from':'from last month','sv-new':'+ New Goal','sv-ins':'Insights','sv-emtip':'Saving for an emergency fund first provides ultimate peace of mind.','sv-learn':'Learn More','wlt-ttl':'My Wallets & Cards','wlt-sub':'Swipe to view · Tap ⋮ to manage','wlt-summary':'Total Across All Cards','st-acclbl':'ACCOUNT PREFERENCES','st-editp':'Edit Profile','st-editpsub':'Name, Avatar, Email','st-sec':'Security','st-notif':'Notifications','st-dark':'Dark Mode','st-darksub':'Adjust visual theme','st-lang':'Language','st-suplbl':'SUPPORT & EXIT','st-help':'Help Center','st-logout':'Log Out','st-logoutsub':'Securely sign out','st-hcft':'HANDCRAFTED FOR FINANCIAL WELLNESS','m-title':'Add Transaction','m-amt':'TRANSACTION AMOUNT','m-cat':'SELECT CATEGORY','m-note':'NOTE (OPTIONAL)','m-complete':'Complete Transaction','cp-sub':'Where did your money flow today?','cp-conf':'Confirm Selection →','n-home':'HOME','n-an':'ANALYTICS','n-sv':'SAVINGS','n-st':'SETTINGS','nc-title':'Notifications','nc-clear':'Mark all read','gm-title':'New Savings Goal','gm-namelbl':'GOAL NAME','gm-sublbl':'DESCRIPTION (OPTIONAL)','gm-targetlbl':'TARGET AMOUNT','gm-currlbl':'CURRENT SAVED','gm-save':'Create Goal','wm-title':'Add Wallet / Card','wm-banklbl':'BANK / WALLET NAME','wm-numlbl':'CARD NUMBER (LAST 4 DIGITS)','wm-ballbl':'CURRENT BALANCE','wm-typelbl':'TYPE','wm-save':'Add Card','svt-goals':'Goals & Bills','svt-wallets':'Wallets & Cards','svt-history':'History',
+  en:{'s-title':'Track Money <em>Like a Pro</em>','s-sub':'Master your finances with editorial-grade analytics and curated spending insights.','s-start':'Get Started','s-have':'Already have an account?','s-login':'Log In','s-badge':'● SYSTEM ONLINE','ql-title':'Welcome Back','ql-sub':'Tap your profile photo to sign in fast','ql-other':'Log in with another account','l-title':'Welcome Back','l-back':'Back','l-sub':'Access your curated financial dashboard','l-elbl':'EMAIL ADDRESS','l-plbl':'PASSWORD','l-forgot':'Forgot Password?','l-btn':'Login','l-or':'OR CONTINUE WITH','l-new':'New to the platform?','l-create':'Create Account','l-footer':'© 2024 MANTAPPS. SECURE. PRIVATE. ESSENTIAL.','loginEmailErr':'Invalid email format','loginPwErr':'Incorrect email or password','r-title':'Create Account','r-back':'Back','r-sub':'Join thousands managing money smarter','r-nlbl':'FULL NAME','r-elbl':'EMAIL ADDRESS','r-plbl':'PASSWORD','r-p2lbl':'CONFIRM PASSWORD','r-btn':'Create Account','r-have':'Already have an account?','r-login':'Log In','regNameErr':'Name is required','regEmailErr':'Invalid email format','regPwErr':'Password must be at least 6 characters','regPw2Err':'Passwords do not match','f-title':'Forgot Password?','f-sub':"Enter your email and we'll send a reset link",'f-elbl':'EMAIL ADDRESS','f-btn':'Send Reset Link','f-back':'Back to Login','f-back2':'← Back to Login','forgotEmailErr':'Invalid email format','h-ballbl':'TOTAL BALANCE','h-gain':'Monthly Gain','h-topup':'Balance History','h-spending':'Monthly Spending','h-view':'View Details','h-recent':'Recent Transactions','h-life':'LIFESTYLE','h-food':'FOOD','h-trans':'TRANSPORT','h-health':'CHARITY','h-shop':'SHOPPING','h-tech':'MARRIAGE','a-overview':'MONTHLY OVERVIEW','a-less':'12% less than last month','a-cat':'Spending by Category','a-goes':'Where your money goes','a-housing':'Housing','a-food':'Food & Dining','a-transport':'Transport','a-leisure':'Leisure','a-top':'Top Categories','a-re':'Top Category 1','a-gas':'Top Category 2','a-ls':'Top Category 3','a-weekly':'Weekly Breakdown','a-7days':'Last 7 days of activity','a-spend':'SPENDING','a-income':'INCOME','a-stip':'Smart Savings Tip','a-tiptext':'You spent 24% more on Dining Out this week. Switch to home cooking twice a week to reach your goal faster!','a-limit':'Set Spending Limit','sv-prog':'TOTAL PROGRESS','sv-from':'from last month','sv-new':'+ New Goal','sv-ins':'Insights','sv-emtip':'Saving for an emergency fund first provides ultimate peace of mind.','sv-learn':'Learn More','wlt-ttl':'My Wallets & Cards','wlt-sub':'Swipe to view · Tap ⋮ to manage','wlt-summary':'Total Across All Cards','st-acclbl':'ACCOUNT PREFERENCES','st-editp':'Edit Profile','st-editpsub':'Name, Avatar, Email','st-sec':'Security','st-notif':'Notifications','st-dark':'Dark Mode','st-darksub':'Adjust visual theme','st-lang':'Language','st-suplbl':'SUPPORT & EXIT','st-help':'Help Center','st-logout':'Log Out','st-logoutsub':'Securely sign out','st-hcft':'HANDCRAFTED FOR FINANCIAL WELLNESS','m-title':'Add Transaction','m-amt':'TRANSACTION AMOUNT','m-cat':'SELECT CATEGORY','m-note':'NOTE (OPTIONAL)','m-complete':'Complete Transaction','cp-sub':'Where did your money flow today?','cp-conf':'Confirm Selection →','n-home':'HOME','n-an':'ANALYTICS','n-sv':'SAVINGS','n-st':'SETTINGS','nc-title':'Notifications','nc-clear':'Mark all read','gm-title':'New Savings Goal','gm-namelbl':'GOAL NAME','gm-sublbl':'DESCRIPTION (OPTIONAL)','gm-targetlbl':'TARGET AMOUNT','gm-currlbl':'CURRENT SAVED','gm-save':'Create Goal','wm-title':'Add Wallet / Card','wm-banklbl':'BANK / WALLET NAME','wm-numlbl':'CARD NUMBER (LAST 4 DIGITS)','wm-ballbl':'CURRENT BALANCE','wm-typelbl':'TYPE','wm-save':'Add Card','svt-goals':'Goals & Bills','svt-wallets':'Wallets & Cards','svt-history':'History',
 'tg-tab-goals':'Goals','tg-tab-bills':'Bills',
 'tg-upcoming-total':'UPCOMING BILLS TOTAL','tg-need-attention':'bill(s) need attention','tg-pay-all':'Pay All',
 'tg-monthly-spending':'Monthly Spending','tg-of-budget':'% of budget','tg-due-soon':'Due Soon',
@@ -6601,7 +6728,7 @@ const TR={
     'pw-nomatch':'Passwords do not match',
     'pin-set':'PIN set!','pin-wrong':'Wrong PIN',
     'today':'Today','nav-income':'Income','nav-expense':'Expense','nav-transfer':'Transfer'},
-  id:{'s-title':'Kelola Uang <em>Seperti Pro</em>','s-sub':'Kuasai keuangan Anda dengan analitik berkelas dan wawasan pengeluaran akurat.','s-start':'Mulai Sekarang','s-have':'Sudah punya akun?','s-login':'Masuk','s-badge':'● SISTEM ONLINE','ql-title':'Selamat Datang Kembali','ql-sub':'Ketuk foto profil untuk masuk cepat','ql-other':'Masuk dengan akun lain','l-title':'Selamat Datang Kembali','l-back':'Kembali','l-sub':'Akses dashboard keuangan Anda','l-elbl':'ALAMAT EMAIL','l-plbl':'PASSWORD','l-forgot':'Lupa Password?','l-btn':'Masuk','l-or':'ATAU LANJUTKAN DENGAN','l-new':'Belum punya akun?','l-create':'Buat Akun','l-footer':'© 2024 MANTAPPS. AMAN. PRIVAT. PENTING.','loginEmailErr':'Format email tidak valid','loginPwErr':'Email atau password salah','r-title':'Buat Akun','r-back':'Kembali','r-sub':'Bergabung bersama ribuan pengguna','r-nlbl':'NAMA LENGKAP','r-elbl':'ALAMAT EMAIL','r-plbl':'PASSWORD','r-p2lbl':'KONFIRMASI PASSWORD','r-btn':'Buat Akun','r-have':'Sudah punya akun?','r-login':'Masuk','regNameErr':'Nama wajib diisi','regEmailErr':'Format email tidak valid','regPwErr':'Password minimal 6 karakter','regPw2Err':'Password tidak cocok','f-title':'Lupa Password?','f-sub':'Masukkan email untuk menerima link reset','f-elbl':'ALAMAT EMAIL','f-btn':'Kirim Link Reset','f-back':'Kembali ke Login','f-back2':'← Kembali ke Login','forgotEmailErr':'Format email tidak valid','h-ballbl':'TOTAL SALDO','h-gain':'Kenaikan Bulanan','h-topup':'Isi Saldo','h-spending':'Pengeluaran Bulanan','h-view':'Lihat Detail','h-recent':'Transaksi Terbaru','h-life':'GAYA HIDUP','h-food':'MAKANAN','h-trans':'TRANSPORTASI','h-health':'AMAL','h-shop':'BELANJA','h-tech':'PERNIKAHAN','a-overview':'RINGKASAN BULANAN','a-less':'12% lebih sedikit dari bulan lalu','a-cat':'Pengeluaran per Kategori','a-goes':'Ke mana uang Anda pergi','a-housing':'Perumahan','a-food':'Makanan & Minuman','a-transport':'Transportasi','a-leisure':'Hiburan','a-top':'Kategori Teratas','a-re':'Kategori 1','a-gas':'Kategori 2','a-ls':'Kategori 3','a-weekly':'Rincian Mingguan','a-7days':'7 hari aktivitas terakhir','a-spend':'PENGELUARAN','a-income':'PENDAPATAN','a-stip':'Tips Hemat Cerdas','a-tiptext':'Anda menghabiskan 24% lebih banyak untuk Makan di Luar minggu ini. Masak di rumah 2x seminggu untuk mencapai tujuan lebih cepat!','a-limit':'Atur Batas Pengeluaran','sv-prog':'TOTAL KEMAJUAN','sv-from':'dari bulan lalu','sv-new':'Tujuan Baru','sv-ins':'Wawasan','sv-emtip':'Menabung untuk dana darurat terlebih dahulu memberikan ketenangan pikiran.','sv-learn':'Pelajari Lebih Lanjut','wlt-ttl':'Dompet & Kartu Saya','wlt-sub':'Geser untuk lihat · Ketuk ⋮ untuk kelola','wlt-summary':'Total Semua Kartu','st-acclbl':'PREFERENSI AKUN','st-editp':'Edit Profil','st-editpsub':'Nama, Avatar, Email','st-sec':'Keamanan','st-notif':'Notifikasi','st-dark':'Mode Gelap','st-darksub':'Sesuaikan tampilan','st-lang':'Bahasa','st-suplbl':'DUKUNGAN & KELUAR','st-help':'Pusat Bantuan','st-logout':'Keluar','st-logoutsub':'Keluar dengan aman','st-hcft':'DIBUAT UNTUK KESEHATAN FINANSIAL','m-title':'Tambah Transaksi','m-amt':'JUMLAH TRANSAKSI','m-cat':'PILIH KATEGORI','m-note':'CATATAN (OPSIONAL)','m-complete':'Selesaikan Transaksi','cp-sub':'Ke mana uang Anda mengalir hari ini?','cp-conf':'Konfirmasi Pilihan →','n-home':'BERANDA','n-an':'ANALITIK','n-sv':'TABUNGAN','n-st':'PENGATURAN','nc-title':'Notifikasi','nc-clear':'Tandai semua dibaca','gm-title':'Tujuan Tabungan Baru','gm-namelbl':'NAMA TUJUAN','gm-sublbl':'DESKRIPSI (OPSIONAL)','gm-targetlbl':'TARGET JUMLAH','gm-currlbl':'SUDAH DITABUNG','gm-save':'Buat Tujuan','wm-title':'Tambah Dompet / Kartu','wm-banklbl':'NAMA BANK / DOMPET','wm-numlbl':'NOMOR KARTU (4 DIGIT TERAKHIR)','wm-ballbl':'SALDO SAAT INI','wm-typelbl':'JENIS','wm-save':'Tambah Kartu','svt-goals':'Tujuan & Tagihan','svt-wallets':'Dompet & Kartu','svt-history':'Riwayat',
+  id:{'s-title':'Kelola Uang <em>Seperti Pro</em>','s-sub':'Kuasai keuangan Anda dengan analitik berkelas dan wawasan pengeluaran akurat.','s-start':'Mulai Sekarang','s-have':'Sudah punya akun?','s-login':'Masuk','s-badge':'● SISTEM ONLINE','ql-title':'Selamat Datang Kembali','ql-sub':'Ketuk foto profil untuk masuk cepat','ql-other':'Masuk dengan akun lain','l-title':'Selamat Datang Kembali','l-back':'Kembali','l-sub':'Akses dashboard keuangan Anda','l-elbl':'ALAMAT EMAIL','l-plbl':'PASSWORD','l-forgot':'Lupa Password?','l-btn':'Masuk','l-or':'ATAU LANJUTKAN DENGAN','l-new':'Belum punya akun?','l-create':'Buat Akun','l-footer':'© 2024 MANTAPPS. AMAN. PRIVAT. PENTING.','loginEmailErr':'Format email tidak valid','loginPwErr':'Email atau password salah','r-title':'Buat Akun','r-back':'Kembali','r-sub':'Bergabung bersama ribuan pengguna','r-nlbl':'NAMA LENGKAP','r-elbl':'ALAMAT EMAIL','r-plbl':'PASSWORD','r-p2lbl':'KONFIRMASI PASSWORD','r-btn':'Buat Akun','r-have':'Sudah punya akun?','r-login':'Masuk','regNameErr':'Nama wajib diisi','regEmailErr':'Format email tidak valid','regPwErr':'Password minimal 6 karakter','regPw2Err':'Password tidak cocok','f-title':'Lupa Password?','f-sub':'Masukkan email untuk menerima link reset','f-elbl':'ALAMAT EMAIL','f-btn':'Kirim Link Reset','f-back':'Kembali ke Login','f-back2':'← Kembali ke Login','forgotEmailErr':'Format email tidak valid','h-ballbl':'TOTAL SALDO','h-gain':'Kenaikan Bulanan','h-topup':'Riwayat Saldo','h-spending':'Pengeluaran Bulanan','h-view':'Lihat Detail','h-recent':'Transaksi Terbaru','h-life':'GAYA HIDUP','h-food':'MAKANAN','h-trans':'TRANSPORTASI','h-health':'AMAL','h-shop':'BELANJA','h-tech':'PERNIKAHAN','a-overview':'RINGKASAN BULANAN','a-less':'12% lebih sedikit dari bulan lalu','a-cat':'Pengeluaran per Kategori','a-goes':'Ke mana uang Anda pergi','a-housing':'Perumahan','a-food':'Makanan & Minuman','a-transport':'Transportasi','a-leisure':'Hiburan','a-top':'Kategori Teratas','a-re':'Kategori 1','a-gas':'Kategori 2','a-ls':'Kategori 3','a-weekly':'Rincian Mingguan','a-7days':'7 hari aktivitas terakhir','a-spend':'PENGELUARAN','a-income':'PENDAPATAN','a-stip':'Tips Hemat Cerdas','a-tiptext':'Anda menghabiskan 24% lebih banyak untuk Makan di Luar minggu ini. Masak di rumah 2x seminggu untuk mencapai tujuan lebih cepat!','a-limit':'Atur Batas Pengeluaran','sv-prog':'TOTAL KEMAJUAN','sv-from':'dari bulan lalu','sv-new':'Tujuan Baru','sv-ins':'Wawasan','sv-emtip':'Menabung untuk dana darurat terlebih dahulu memberikan ketenangan pikiran.','sv-learn':'Pelajari Lebih Lanjut','wlt-ttl':'Dompet & Kartu Saya','wlt-sub':'Geser untuk lihat · Ketuk ⋮ untuk kelola','wlt-summary':'Total Semua Kartu','st-acclbl':'PREFERENSI AKUN','st-editp':'Edit Profil','st-editpsub':'Nama, Avatar, Email','st-sec':'Keamanan','st-notif':'Notifikasi','st-dark':'Mode Gelap','st-darksub':'Sesuaikan tampilan','st-lang':'Bahasa','st-suplbl':'DUKUNGAN & KELUAR','st-help':'Pusat Bantuan','st-logout':'Keluar','st-logoutsub':'Keluar dengan aman','st-hcft':'DIBUAT UNTUK KESEHATAN FINANSIAL','m-title':'Tambah Transaksi','m-amt':'JUMLAH TRANSAKSI','m-cat':'PILIH KATEGORI','m-note':'CATATAN (OPSIONAL)','m-complete':'Selesaikan Transaksi','cp-sub':'Ke mana uang Anda mengalir hari ini?','cp-conf':'Konfirmasi Pilihan →','n-home':'BERANDA','n-an':'ANALITIK','n-sv':'TABUNGAN','n-st':'PENGATURAN','nc-title':'Notifikasi','nc-clear':'Tandai semua dibaca','gm-title':'Tujuan Tabungan Baru','gm-namelbl':'NAMA TUJUAN','gm-sublbl':'DESKRIPSI (OPSIONAL)','gm-targetlbl':'TARGET JUMLAH','gm-currlbl':'SUDAH DITABUNG','gm-save':'Buat Tujuan','wm-title':'Tambah Dompet / Kartu','wm-banklbl':'NAMA BANK / DOMPET','wm-numlbl':'NOMOR KARTU (4 DIGIT TERAKHIR)','wm-ballbl':'SALDO SAAT INI','wm-typelbl':'JENIS','wm-save':'Tambah Kartu','svt-goals':'Tujuan & Tagihan','svt-wallets':'Dompet & Kartu','svt-history':'Riwayat',
 'tg-tab-goals':'Tujuan','tg-tab-bills':'Tagihan',
 'tg-upcoming-total':'TOTAL TAGIHAN MENDATANG','tg-need-attention':'tagihan perlu perhatian','tg-pay-all':'Bayar Semua',
 'tg-monthly-spending':'Pengeluaran Bulan Ini','tg-of-budget':'% dari anggaran','tg-due-soon':'Segera Jatuh Tempo',
