@@ -12885,18 +12885,35 @@ function openAnggaranRiwayat(id){
       Belum ada transaksi untuk kategori ini di bulan ini.
     </div>`;
   } else {
-    listEl.innerHTML = txs.map(h => {
+    // List TETAP urut tanggal (terbaru dulu, sama seperti sort di atas) —
+    // label pemisah wallet cuma penanda visual (sticky, ala kontak HP),
+    // BUKAN pengelompokan ulang. Kalau wallet-nya gonta-ganti lalu balik
+    // lagi, label yang sama akan muncul lagi di tempat lain — itu memang
+    // disengaja supaya urutan tanggal tetap akurat.
+    let html = '';
+    let lastWallet = null;
+    txs.forEach(h => {
+      const walletLabel = h.src || (lang==='id' ? 'Lainnya' : 'Other');
+      if(walletLabel !== lastWallet){
+        html += `<div style="position:sticky;top:0;background:var(--surface);padding:10px 0 6px;z-index:2;">
+          <div style="display:flex;align-items:center;gap:6px;background:var(--surface2);border-radius:8px;padding:6px 10px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--blue2)" stroke-width="2"><rect x="3" y="8" width="18" height="11" rx="2"/><path d="M3 8l9-5 9 5"/></svg>
+            <span style="font-size:11px;font-weight:700;color:var(--blue2);letter-spacing:.3px;">${escapeHtml(walletLabel)}</span>
+          </div>
+        </div>`;
+        lastWallet = walletLabel;
+      }
       const nm = escapeHtml(h.langKey ? (T(h.langKey)||h.name) : h.name);
-      const srcInfo = h.src ? `<span style="font-size:10px;color:var(--t3);margin-left:4px;">· ${escapeHtml(h.src)}</span>` : '';
-      return `<div class="h-item" onclick="openTxDetail(${h.id})" style="cursor:pointer;">
+      html += `<div class="h-item" onclick="openTxDetail(${h.id})" style="cursor:pointer;">
         <div class="h-ico">${c.svg ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${c.stroke}" stroke-width="1.8">${c.svg}</svg>` : ''}</div>
         <div style="flex:1;">
           <div class="h-nm">${nm}</div>
-          <div class="h-t">${fmtItemTime(h)}${srcInfo}</div>
+          <div class="h-t">${fmtItemTime(h)}</div>
         </div>
         <div class="h-a neg">-${fmt(Math.abs(h.amt))}</div>
       </div>`;
-    }).join('');
+    });
+    listEl.innerHTML = html;
   }
 
   document.getElementById('anggaranRiwayatModal').classList.add('on');
